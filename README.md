@@ -1,2 +1,2 @@
-# Jupiter
+# JupiterEngine
  OpenGL Rendering Engine
