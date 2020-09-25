@@ -21,5 +21,13 @@
     <ClCompile Include="dependencies\glad\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Shaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\BasicVertex.shader" />
+    <None Include="src\shaders\BasicFragment.shader" />
+    <None Include="src\shaders\FragYellow.shader" />
   </ItemGroup>
 </Project>

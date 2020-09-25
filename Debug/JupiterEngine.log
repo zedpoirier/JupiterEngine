@@ -1,3 +1,5 @@
-﻿  glad.c
-  Application.cpp
+﻿  Application.cpp
+C:\Dev\JupiterEngine\src\Application.cpp(111,47): warning C4129: 'B': unrecognized character escape sequence
+C:\Dev\JupiterEngine\src\Application.cpp(112,49): warning C4129: 'F': unrecognized character escape sequence
+C:\Dev\JupiterEngine\src\Application.cpp(113,52): warning C4129: 'Y': unrecognized character escape sequence
   JupiterEngine.vcxproj -> C:\Dev\JupiterEngine\Debug\JupiterEngine.exe

@@ -131,6 +131,12 @@
   <ItemGroup>
     <ClCompile Include="dependencies\glad\src\glad.c" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Shaders.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\BasicFragment.shader" />
+    <None Include="src\shaders\BasicVertex.shader" />
+    <None Include="src\shaders\FragYellow.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,104 +1,29 @@
 #include <glad/include/glad/glad.h>
 #include <glfw/include/GLFW/glfw3.h>
 #include <iostream>
-//#include <fstream>
-//#include <string>
-//#include <sstream>
-//std::string vertexShaderSourceString;
-//std::string fragmentShaderSourceString;
-
-// prototype functions
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+#include <fstream>
+#include <sstream>
+#include <string>
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-const char* vertexShaderSource =
-"#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-const char* fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0";
-const char* fragmentShaderTwoSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"	FragColor = vec4(0.9f, 0.8f, 0.2f, 1.0f);\n"
-"}\0";
+//std::string vertexShaderSourceString;
+//std::string fragmentShaderSourceString;
 
-// Parse Shader Code to String
-//static std::string ParseShader(const std::string& filepath)
-//{
-//	std::ifstream stream(filepath);
-//	std::string line;
-//	std::stringstream ss;
-//	while (getline(stream, line))
-//	{
-//		ss << line << "\n";
-//	}
-//	return ss.str();
-//}
+// prototype functions
+int SetupGLFW();
+void processInput(GLFWwindow* window);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+const char* ParseShader(const std::string& filepath);
+unsigned int CompileShader(unsigned int type, const char* shaderSource);
+//unsigned int CreateShader(const std::string& vertexShader);
+//unsigned int CreateShader(const std::string& fragmentShader);
+unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader);
 
-// Compile Shader
-//static unsigned int CompileShader(unsigned int type, const std::string& shaderSource)
-//{
-//	unsigned int id = glCreateShader(type);
-//	const char* src = shaderSource.c_str();
-//	glShaderSource(id, 1, &src, NULL);
-//	glCompileShader(id);
-//
-//	// error checking
-//	int result;
-//	char infoLog[512];
-//	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-//	if (result == GL_FALSE)
-//	{
-//		glGetShaderInfoLog(id, 512, NULL, infoLog);
-//		std::cout << "ERROR::SHADER::" << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT") << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-//	}
-//
-//	return id;
-//}
-//
-//// Create shader program
-//static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
-//{
-//	unsigned int program = glCreateProgram();
-//	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-//	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-//
-//	glAttachShader(program, vs);
-//	glAttachShader(program, fs);
-//	glLinkProgram(program);
-//	glValidateProgram(program);
-//
-//	// error checking
-//	int success;
-//	char infoLog[512];
-//	glGetProgramiv(program, GL_LINK_STATUS, &success);
-//	if (!success) {
-//		glGetProgramInfoLog(program, 512, NULL, infoLog);
-//		std::cout << "ERROR::SHADER::PROGRAM-TWO::LINKING_FAILED\n" << infoLog << std::endl;
-//	}
-//
-//	glDeleteShader(vs);
-//	glDeleteShader(fs);
-//	return program;
-//}
-
-// Main is the entry point
-int main() {
-
+// main is the entry point
+int main() 
+{
 	// glfw: initialize and configure
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -115,7 +40,7 @@ int main() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-
+	SetupGLFW();
 	// glad: load all OpenGl function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -180,74 +105,15 @@ int main() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 
-	// compile error checker data
-	int  success;
-	char infoLog[512];
-	// vertex shader setup
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	// check for VS compile errors
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// fragment shader setup
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// check for PS compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// fragment shader 2 setup
-	unsigned int fragmentShaderTwo;
-	fragmentShaderTwo = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShaderTwo, 1, &fragmentShaderTwoSource, NULL);
-	glCompileShader(fragmentShaderTwo);
-	glGetShaderiv(fragmentShaderTwo, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShaderTwo, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT-TWO::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// shader program linking
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	// check for SP linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	// shader program two linking
-	unsigned int shaderProgramTwo;
-	shaderProgramTwo = glCreateProgram();
-	glAttachShader(shaderProgramTwo, vertexShader);
-	glAttachShader(shaderProgramTwo, fragmentShaderTwo);
-	glLinkProgram(shaderProgramTwo);
-	// check for SP linking errors
-	glGetProgramiv(shaderProgramTwo, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgramTwo, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM-TWO::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	glDeleteShader(fragmentShaderTwo);
 
-
-
+	std::cout << "Jupiter is rising bitches..." << std::endl;
+	std::cout << "Fucking Test == " << std::endl;
+	const char* vertexShaderSource = ParseShader("src\res\BasicVertex.shader");
+	const char* fragmentShaderSource = ParseShader("src\res\FragmentVertex.shader");
+	const char* fragmentShaderTwoSource = ParseShader("src\res\YellowFragment.shader");
+	unsigned int shaderProgram = CreateShader(vertexShaderSource, fragmentShaderSource);
+	unsigned int shaderProgramTwo = CreateShader(vertexShaderSource, fragmentShaderTwoSource);
+	
 	// Main Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -264,9 +130,6 @@ int main() {
 		glUseProgram(shaderProgramTwo);
 		glBindVertexArray(VAO2);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//glBindVertexArray(0);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
@@ -278,15 +141,83 @@ int main() {
 	return 0;
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// glfw: whenever the window size changes (by OS or user resize) this callback function executes
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// glfw: process all input pressed/released this frame and react accordingly
 void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+}
+
+// cherno: parse shader code from a .shader file to a const char*
+static const char* ParseShader(const std::string& filepath)
+{
+	const char* result;
+	std::string line;
+	std::stringstream ss;
+	std::ifstream stream(filepath);
+	while (getline(stream, line))
+	{
+		ss << line << "\n";
+	}
+	result = ss.str().c_str();
+	return result;
+}
+
+// cherno: compile Shader
+static unsigned int CompileShader(unsigned int type, const char* shaderSource)
+{
+	unsigned int id = glCreateShader(type);
+	glShaderSource(id, 1, &shaderSource, NULL);
+	glCompileShader(id);
+
+	// error checking
+	int result;
+	char infoLog[512];
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		glGetShaderInfoLog(id, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::" << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT") << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+		std::cout << "ALSO POOP" << std::endl;
+	}
+
+	return id;
+}
+
+// Create shader program
+static unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader)
+{
+	unsigned int program = glCreateProgram();
+	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
+	glLinkProgram(program);
+	glValidateProgram(program);
+
+	// error checking
+	int success;
+	char infoLog[512];
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(program, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM-TWO::LINKING_FAILED\n" << infoLog << std::endl;
+	}
+
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+	return program;
+}
+
+// All the GLFW setup window stuff
+int SetupGLFW()
+{
+	return 1;
 }
