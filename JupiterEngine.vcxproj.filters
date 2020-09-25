@@ -26,8 +26,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\BasicVertex.shader" />
-    <None Include="src\shaders\BasicFragment.shader" />
-    <None Include="src\shaders\FragYellow.shader" />
+    <None Include="res\shaders\BasicFragment.shader" />
+    <None Include="res\shaders\BasicVertex.shader" />
+    <None Include="res\shaders\FragYellow.shader" />
+    <None Include="packages.config" />
+    <None Include="res\shaders\Shapes.shader" />
   </ItemGroup>
 </Project>

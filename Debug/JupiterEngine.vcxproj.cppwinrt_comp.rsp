@@ -1,0 +1,3 @@
+-overwrite -name JupiterEngine -pch stdafx.h -prefix -comp "Debug\Generated Files\sources"  -ref "C:\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Foundation.FoundationContract\4.0.0.0\Windows.Foundation.FoundationContract.winmd"
+-ref "C:\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Foundation.UniversalApiContract\10.0.0.0\Windows.Foundation.UniversalApiContract.winmd"
+-ref "C:\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Networking.Connectivity.WwanContract\2.0.0.0\Windows.Networking.Connectivity.WwanContract.winmd" -out "Debug\Generated Files\."

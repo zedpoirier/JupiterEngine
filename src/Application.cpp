@@ -8,17 +8,12 @@
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-//std::string vertexShaderSourceString;
-//std::string fragmentShaderSourceString;
 
 // prototype functions
-int SetupGLFW();
 void processInput(GLFWwindow* window);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-const char* ParseShader(const std::string& filepath);
+std::string ParseShader(const std::string& filepath);
 unsigned int CompileShader(unsigned int type, const char* shaderSource);
-//unsigned int CreateShader(const std::string& vertexShader);
-//unsigned int CreateShader(const std::string& fragmentShader);
 unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader);
 
 // main is the entry point
@@ -40,7 +35,6 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-	SetupGLFW();
 	// glad: load all OpenGl function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -48,9 +42,6 @@ int main()
 		return -1;
 	}
 
-	// exercise 1: two triangles
-	// exercise 2: 2 VAOs and VBOs
-	// exercise 3: 2 shader programs
 	float triangle1[] = {
 		-0.5f, 0.0f, 0.0f,
 		-0.5f, 0.5f, 0.0f,
@@ -73,6 +64,18 @@ int main()
 	unsigned int quadIndices[] = {
 		0, 1, 3,   // first triangle
 		1, 2, 3    // second triangle
+	};
+
+	float fullScreenQuad[] = {
+		-1.0, -1.0, 0.0,
+		-1.0, 1.0, 0.0,
+		1.0, 1.0, 0.0,
+		1.0, -1.0, 0.0
+	};
+
+	unsigned int fullScreenQuadIndices[] = {
+		0, 1, 3,
+		1, 2, 3
 	};
 
 	// vao and vbo 1
@@ -107,41 +110,38 @@ int main()
 
 
 	std::cout << "Jupiter is rising bitches..." << std::endl;
-	std::cout << "Fucking Test == " << std::endl;
-	const char* vertexShaderSource = ParseShader("src\res\BasicVertex.shader");
-	const char* fragmentShaderSource = ParseShader("src\res\FragmentVertex.shader");
-	const char* fragmentShaderTwoSource = ParseShader("src\res\YellowFragment.shader");
-	std::cout << "vertexShaderSource == " << vertexShaderSource << std::endl;
-	std::cout << "fragmentShaderSource == " << fragmentShaderSource << std::endl;
-	std::cout << "fragmentShaderTwoSource == " << fragmentShaderTwoSource << std::endl;
-	vertexShaderSource =
-		"#version 330 core\n"
-		"layout(location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
-	fragmentShaderSource =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0";
-	fragmentShaderTwoSource =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"	FragColor = vec4(0.9f, 0.8f, 0.2f, 1.0f);\n"
-		"}\0";
 
-	std::cout << "vertexShaderSource == " << vertexShaderSource << std::endl;
-	std::cout << "fragmentShaderSource == " << fragmentShaderSource << std::endl;
-	std::cout << "fragmentShaderTwoSource == " << fragmentShaderTwoSource << std::endl;
+	// setup vertex array object
+	unsigned int vaoFullQuad;
+	glGenVertexArrays(1, &vaoFullQuad);
+	glBindVertexArray(vaoFullQuad);
+	// build and bind vertex buffer object to array object
+	unsigned int vboFullQuad;
+	glGenBuffers(1, &vboFullQuad);
+	glBindBuffer(GL_ARRAY_BUFFER, vboFullQuad);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fullScreenQuad), fullScreenQuad, GL_STATIC_DRAW);
+	// build and bind element buffer object to array object
+	unsigned int eboFullQuad;
+	glGenBuffers(1, &eboFullQuad);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(fullScreenQuadIndices), fullScreenQuadIndices, GL_STATIC_DRAW);
+	// set the vertex attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
+	// Parsing Shader Sources
+	std::string vertexShaderSourceString = ParseShader("res/shaders/BasicVertex.shader");
+	const char* vertexShaderSource = vertexShaderSourceString.c_str();
+	std::string fragmentShaderSourceString = ParseShader("res/shaders/BasicFragment.shader");
+	const char* fragmentShaderSource = fragmentShaderSourceString.c_str();
+	std::string fragmentShaderTwoSourceString = ParseShader("res/shaders/FragYellow.shader");
+	const char* fragmentShaderTwoSource = fragmentShaderTwoSourceString.c_str();
+	std::string shapesShaderSourceString = ParseShader("res/shaders/Shapes.shader");
+	const char* shapesShaderSource = shapesShaderSourceString.c_str();
+	// Creating Shaders
 	unsigned int shaderProgram = CreateShader(vertexShaderSource, fragmentShaderSource);
 	unsigned int shaderProgramTwo = CreateShader(vertexShaderSource, fragmentShaderTwoSource);
+	unsigned int fullScreenQuadProgram = CreateShader(vertexShaderSource, shapesShaderSource);
 	
 	// Main Loop
 	while (!glfwWindowShouldClose(window))
@@ -159,6 +159,10 @@ int main()
 		glUseProgram(shaderProgramTwo);
 		glBindVertexArray(VAO2);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glUseProgram(fullScreenQuadProgram);
+		glBindVertexArray(vaoFullQuad);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
@@ -184,9 +188,8 @@ void processInput(GLFWwindow* window)
 }
 
 // cherno: parse shader code from a .shader file to a const char*
-static const char* ParseShader(const std::string& filepath)
+static std::string ParseShader(const std::string& filepath)
 {
-	const char* result;
 	std::string line;
 	std::stringstream ss;
 	std::ifstream stream(filepath);
@@ -194,11 +197,11 @@ static const char* ParseShader(const std::string& filepath)
 	{
 		ss << line << "\n";
 	}
-	result = ss.str().c_str();
+	std::string result = ss.str();
 	return result;
 }
 
-// cherno: compile Shader
+// cherno: compile single shader (vertex or fragment only for now)
 static unsigned int CompileShader(unsigned int type, const char* shaderSource)
 {
 	unsigned int id = glCreateShader(type);
@@ -219,7 +222,7 @@ static unsigned int CompileShader(unsigned int type, const char* shaderSource)
 	return id;
 }
 
-// Create shader program
+// cherno: create shader program and compile shaders
 static unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader)
 {
 	unsigned int program = glCreateProgram();
@@ -243,10 +246,4 @@ static unsigned int CreateShader(const char*& vertexShader, const char*& fragmen
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 	return program;
-}
-
-// All the GLFW setup window stuff
-int SetupGLFW()
-{
-	return 1;
 }
