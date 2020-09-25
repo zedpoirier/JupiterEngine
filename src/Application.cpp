@@ -111,6 +111,35 @@ int main()
 	const char* vertexShaderSource = ParseShader("src\res\BasicVertex.shader");
 	const char* fragmentShaderSource = ParseShader("src\res\FragmentVertex.shader");
 	const char* fragmentShaderTwoSource = ParseShader("src\res\YellowFragment.shader");
+	std::cout << "vertexShaderSource == " << vertexShaderSource << std::endl;
+	std::cout << "fragmentShaderSource == " << fragmentShaderSource << std::endl;
+	std::cout << "fragmentShaderTwoSource == " << fragmentShaderTwoSource << std::endl;
+	vertexShaderSource =
+		"#version 330 core\n"
+		"layout(location = 0) in vec3 aPos;\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+		"}\0";
+	fragmentShaderSource =
+		"#version 330 core\n"
+		"out vec4 FragColor;\n"
+		"void main()\n"
+		"{\n"
+		"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+		"}\0";
+	fragmentShaderTwoSource =
+		"#version 330 core\n"
+		"out vec4 FragColor;\n"
+		"void main()\n"
+		"{\n"
+		"	FragColor = vec4(0.9f, 0.8f, 0.2f, 1.0f);\n"
+		"}\0";
+
+	std::cout << "vertexShaderSource == " << vertexShaderSource << std::endl;
+	std::cout << "fragmentShaderSource == " << fragmentShaderSource << std::endl;
+	std::cout << "fragmentShaderTwoSource == " << fragmentShaderTwoSource << std::endl;
+
 	unsigned int shaderProgram = CreateShader(vertexShaderSource, fragmentShaderSource);
 	unsigned int shaderProgramTwo = CreateShader(vertexShaderSource, fragmentShaderTwoSource);
 	
