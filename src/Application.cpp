@@ -1,20 +1,9 @@
-#include <glad/include/glad/glad.h>
-#include <glfw/include/GLFW/glfw3.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+#include <headers.h>
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
-// prototype functions
-void processInput(GLFWwindow* window);
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-std::string ParseShader(const std::string& filepath);
-unsigned int CompileShader(unsigned int type, const char* shaderSource);
-unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader);
+bool SQUARE = false;
+const unsigned int SCR_WIDTH = 500;
+const unsigned int SCR_HEIGHT = 500;
 
 // main is the entry point
 int main() 
@@ -54,28 +43,16 @@ int main()
 		0.0f, 0.0f, 0.0f
 	};
 
-	// simple quad with indices
 	float quad[] = {
-	 0.5f,  0.5f, 0.0f,  // top right
-	 0.5f, -0.5f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f,  // bottom left
-	-0.5f,  0.5f, 0.0f   // top left 
+		-0.9, -0.9, 0.0,
+		-0.9, 0.9, 0.0,
+		0.9, 0.9, 0.0,
+		0.9, -0.9, 0.0
 	};
+
 	unsigned int quadIndices[] = {
 		0, 1, 3,   // first triangle
 		1, 2, 3    // second triangle
-	};
-
-	float fullScreenQuad[] = {
-		-1.0, -1.0, 0.0,
-		-1.0, 1.0, 0.0,
-		1.0, 1.0, 0.0,
-		1.0, -1.0, 0.0
-	};
-
-	unsigned int fullScreenQuadIndices[] = {
-		0, 1, 3,
-		1, 2, 3
 	};
 
 	// vao and vbo 1
@@ -119,12 +96,13 @@ int main()
 	unsigned int vboFullQuad;
 	glGenBuffers(1, &vboFullQuad);
 	glBindBuffer(GL_ARRAY_BUFFER, vboFullQuad);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(fullScreenQuad), fullScreenQuad, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
 	// build and bind element buffer object to array object
 	unsigned int eboFullQuad;
+
 	glGenBuffers(1, &eboFullQuad);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(fullScreenQuadIndices), fullScreenQuadIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 	// set the vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -146,23 +124,28 @@ int main()
 	// Main Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		// Input
+		// glfw:: process input
 		processInput(window);
 
-		// Render
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		// glad: process render
+		// processRender();
 
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO1);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glUseProgram(shaderProgramTwo);
-		glBindVertexArray(VAO2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// glad: render background
+		glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		// glad: render custom shader quad
 		glUseProgram(fullScreenQuadProgram);
 		glBindVertexArray(vaoFullQuad);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+		// glad: render orange triangle
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO1);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// glad: render yellow triangle
+		glUseProgram(shaderProgramTwo);
+		glBindVertexArray(VAO2);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);

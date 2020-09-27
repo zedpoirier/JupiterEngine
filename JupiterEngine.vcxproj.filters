@@ -30,6 +30,12 @@
     <None Include="res\shaders\BasicVertex.shader" />
     <None Include="res\shaders\FragYellow.shader" />
     <None Include="packages.config" />
-    <None Include="res\shaders\Shapes.shader" />
+    <None Include="res\shaders\Shapes.vs" />
+    <None Include="res\shaders\Shapes.ps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\headers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
