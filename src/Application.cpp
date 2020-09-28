@@ -1,5 +1,17 @@
 #include <headers.h>
 
+/*
+	things worth trying to emulate:
+
+	compute:
+	https://twitter.com/totallyRonja/status/1287421347749076992
+	https://twitter.com/weigert__/status/1290023570056216577
+
+	graphics:
+	https://twitter.com/algomystic/status/1306634253153775616
+	https://twitter.com/FreyaHolmer/status/1264248161926893568
+*/
+
 // settings
 bool SQUARE = false;
 const unsigned int SCR_WIDTH = 500;
@@ -44,10 +56,10 @@ int main()
 	};
 
 	float quad[] = {
-		-0.9, -0.9, 0.0,
-		-0.9, 0.9, 0.0,
-		0.9, 0.9, 0.0,
-		0.9, -0.9, 0.0
+		-1.0, -1.0, 0.0,
+		-1.0, 1.0, 0.0,
+		1.0, 1.0, 0.0,
+		1.0, -1.0, 0.0
 	};
 
 	unsigned int quadIndices[] = {
@@ -114,12 +126,15 @@ int main()
 	const char* fragmentShaderSource = fragmentShaderSourceString.c_str();
 	std::string fragmentShaderTwoSourceString = ParseShader("res/shaders/FragYellow.shader");
 	const char* fragmentShaderTwoSource = fragmentShaderTwoSourceString.c_str();
-	std::string shapesShaderSourceString = ParseShader("res/shaders/Shapes.shader");
-	const char* shapesShaderSource = shapesShaderSourceString.c_str();
+	std::string shapesVSSourceString = ParseShader("res/shaders/ShapesVS.shader");
+	std::string shapesPSSourceString = ParseShader("res/shaders/ShapesPS.shader");
+	const char* shapesVSSource = shapesVSSourceString.c_str();
+	const char* shapesPSSource = shapesPSSourceString.c_str();
+
 	// Creating Shaders
 	unsigned int shaderProgram = CreateShader(vertexShaderSource, fragmentShaderSource);
 	unsigned int shaderProgramTwo = CreateShader(vertexShaderSource, fragmentShaderTwoSource);
-	unsigned int fullScreenQuadProgram = CreateShader(vertexShaderSource, shapesShaderSource);
+	unsigned int quadProgram = CreateShader(shapesVSSource, shapesPSSource);
 	
 	// Main Loop
 	while (!glfwWindowShouldClose(window))
@@ -134,7 +149,7 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		// glad: render custom shader quad
-		glUseProgram(fullScreenQuadProgram);
+		glUseProgram(quadProgram);
 		glBindVertexArray(vaoFullQuad);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		// glad: render orange triangle
