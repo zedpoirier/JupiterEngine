@@ -14,8 +14,13 @@
 
 // settings
 bool SQUARE = false;
-const unsigned int SCR_WIDTH = 500;
-const unsigned int SCR_HEIGHT = 500;
+double mousePosX = 0;
+double mousePosY = 0;
+double deltaTime = 0.0;
+double elapsedTime = 0.0;
+unsigned int frameCount = 0;
+unsigned int screenWidth = 500;
+unsigned int screenHeight = 500;
 
 // main is the entry point
 int main() 
@@ -27,7 +32,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// glfw: create a window
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Proto Engine", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL Proto Engine", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -140,10 +145,16 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		// glfw:: process input
+		frameCount++;
 		processInput(window);
-
-		// glad: process render
-		// processRender();
+		deltaTime = glfwGetTime() - elapsedTime;
+		elapsedTime = glfwGetTime();
+		glfwGetCursorPos(window, &mousePosX, &mousePosY);
+		std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
+		std::cout << "Delta Time: " << deltaTime << std::endl;
+		std::cout << "Frame Count: " << frameCount << std::endl;
+		std::cout << "Elapsed Time: " << elapsedTime << std::endl;
+		std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
 
 		// glad: render background
 		glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
