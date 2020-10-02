@@ -13,14 +13,13 @@
 */
 
 // settings
-bool SQUARE = false;
+double time = 0.0;
+double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
-double deltaTime = 0.0;
-double elapsedTime = 0.0;
-unsigned int frameCount = 0;
-unsigned int screenWidth = 500;
-unsigned int screenHeight = 500;
+unsigned int frame = 0;
+unsigned int width = 300;
+unsigned int height = 300;
 
 // main is the entry point
 int main() 
@@ -32,7 +31,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// glfw: create a window
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL Proto Engine", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL Proto Engine", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -123,52 +122,50 @@ int main()
 	// set the vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
-	// Parsing Shader Sources
-	std::string vertexShaderSourceString = ParseShader("res/shaders/BasicVertex.shader");
-	const char* vertexShaderSource = vertexShaderSourceString.c_str();
-	std::string fragmentShaderSourceString = ParseShader("res/shaders/BasicFragment.shader");
-	const char* fragmentShaderSource = fragmentShaderSourceString.c_str();
-	std::string fragmentShaderTwoSourceString = ParseShader("res/shaders/FragYellow.shader");
-	const char* fragmentShaderTwoSource = fragmentShaderTwoSourceString.c_str();
-	std::string shapesVSSourceString = ParseShader("res/shaders/ShapesVS.shader");
-	std::string shapesPSSourceString = ParseShader("res/shaders/ShapesPS.shader");
-	const char* shapesVSSource = shapesVSSourceString.c_str();
-	const char* shapesPSSource = shapesPSSourceString.c_str();
-
-	// Creating Shaders
-	unsigned int shaderProgram = CreateShader(vertexShaderSource, fragmentShaderSource);
-	unsigned int shaderProgramTwo = CreateShader(vertexShaderSource, fragmentShaderTwoSource);
-	unsigned int quadProgram = CreateShader(shapesVSSource, shapesPSSource);
 	
-	// Main Loop
+	// Parsing and Creating Shaders
+	std::string vsSource = ParseShader("res/shaders/shader.vs");
+	std::string fsSource = ParseShader("res/shaders/shader.fs");
+	const char* vs = vsSource.c_str();
+	const char* fs = fsSource.c_str();
+	unsigned int program = CreateShader(vs, fs);
+	
+	
+	// main Loop
 	while (!glfwWindowShouldClose(window))
 	{
+		//TODO process();
+		//TODO render();
+
 		// glfw:: process input
-		frameCount++;
+		frame++;
 		processInput(window);
-		deltaTime = glfwGetTime() - elapsedTime;
-		elapsedTime = glfwGetTime();
+		delta = glfwGetTime() - time;
+		time = glfwGetTime();
 		glfwGetCursorPos(window, &mousePosX, &mousePosY);
-		std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
+		/*std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
 		std::cout << "Delta Time: " << deltaTime << std::endl;
 		std::cout << "Frame Count: " << frameCount << std::endl;
 		std::cout << "Elapsed Time: " << elapsedTime << std::endl;
-		std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
+		std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;*/
 
-		// glad: render background
+		//// glad: render
 		glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		glUseProgram(program);
+		int timeID = glGetUniformLocation(program, "time");
+		glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
+		int resoID = glGetUniformLocation(program, "reso");
+		glUniform4f(resoID, width, height, 0.2, 0.0);
+
+
 		// glad: render custom shader quad
-		glUseProgram(quadProgram);
 		glBindVertexArray(vaoFullQuad);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		// glad: render orange triangle
-		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		// glad: render yellow triangle
-		glUseProgram(shaderProgramTwo);
 		glBindVertexArray(VAO2);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	

@@ -139,8 +139,13 @@
     <None Include="res\shaders\BasicFragment.shader" />
     <None Include="res\shaders\BasicVertex.shader" />
     <None Include="res\shaders\FragYellow.shader" />
+    <None Include="res\shaders\FS.shader" />
+    <None Include="res\shaders\shader.fs" />
+    <None Include="res\shaders\shader.gs" />
+    <None Include="res\shaders\shader.vs" />
     <None Include="res\shaders\ShapesPS.shader" />
     <None Include="res\shaders\ShapesVS.shader" />
+    <None Include="res\shaders\VS.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h" />
