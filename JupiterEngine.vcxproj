@@ -136,19 +136,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="res\shaders\BasicFragment.shader" />
-    <None Include="res\shaders\BasicVertex.shader" />
-    <None Include="res\shaders\FragYellow.shader" />
     <None Include="res\shaders\FS.shader" />
-    <None Include="res\shaders\shader.fs" />
-    <None Include="res\shaders\shader.gs" />
-    <None Include="res\shaders\shader.vs" />
-    <None Include="res\shaders\ShapesPS.shader" />
-    <None Include="res\shaders\ShapesVS.shader" />
-    <None Include="res\shaders\VS.shader" />
+    <None Include="res\shaders\shader.comp" />
+    <None Include="res\shaders\shader.frag" />
+    <None Include="res\shaders\shader.geom" />
+    <None Include="res\shaders\shader.tese" />
+    <None Include="res\shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h" />
+    <ClInclude Include="src\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\awesomeface.png" />
+    <Image Include="res\textures\container.jpg" />
+    <Image Include="res\textures\EBITS002.dds" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

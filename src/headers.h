@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 
 // prototype functions

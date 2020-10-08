@@ -18,8 +18,8 @@ double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 300;
-unsigned int height = 300;
+unsigned int width = 500;
+unsigned int height = 500;
 
 // main is the entry point
 int main() 
@@ -40,6 +40,7 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+	glfwSetWindowPos(window, 500, 200);
 	// glad: load all OpenGl function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -47,23 +48,14 @@ int main()
 		return -1;
 	}
 
-	float triangle1[] = {
-		-0.5f, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.0f, 0.0f, 0.0f
-	};
-
-	float triangle2[] = {
-		0.5f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.0f, 0.0f
-	};
+	std::cout << "Jupiter is rising bitches..." << std::endl;
 
 	float quad[] = {
-		-1.0, -1.0, 0.0,
-		-1.0, 1.0, 0.0,
-		1.0, 1.0, 0.0,
-		1.0, -1.0, 0.0
+		// positions          // colors           // texcoords
+		/**/ -0.8, -0.8, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 0.0, 0.0,
+		/**/ -0.8,  0.8, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+		/**/  0.8,  0.8, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 1.0, 1.0,
+		/**/  0.8, -0.8, 0.0, /**/ 1.0, 1.0, 1.0, /**/ 1.0, 0.0
 	};
 
 	unsigned int quadIndices[] = {
@@ -71,38 +63,27 @@ int main()
 		1, 2, 3    // second triangle
 	};
 
-	// vao and vbo 1
-	unsigned int VAO1;
-	glGenVertexArrays(1, &VAO1);
-	glBindVertexArray(VAO1);
-	unsigned int VBO1;
-	glGenBuffers(1, &VBO1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle1), triangle1, GL_STATIC_DRAW);
-	// vertex attribute linking
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// vao and vbo 2
-	unsigned int VAO2;
-	glGenVertexArrays(1, &VAO2);
-	glBindVertexArray(VAO2);
-	unsigned int VBO2;
-	glGenBuffers(1, &VBO2);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2), triangle2, GL_STATIC_DRAW);
-	// vertex attribute linking
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// element buffer object for quad - uses indices
-	unsigned int ebo;
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
-
-
-	std::cout << "Jupiter is rising bitches..." << std::endl;
+	// stb: load images
+	stbi_set_flip_vertically_on_load(true);
+	int imgWidth, imgHeight, imgNumChannels;
+	unsigned char* data = stbi_load("res/textures/container.jpg", &imgWidth, &imgHeight, &imgNumChannels, 0);
+	// create texture
+	unsigned int texture0;
+	glGenTextures(1, &texture0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	// stb: free image from memorysx
+	stbi_image_free(data);
+	// repeat for second texture
+	data = stbi_load("res/textures/awesomeface.png", &imgWidth, &imgHeight, &imgNumChannels, 0);
+	unsigned int texture1;
+	glGenTextures(1, &texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// setup vertex array object
 	unsigned int vaoFullQuad;
@@ -115,21 +96,23 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
 	// build and bind element buffer object to array object
 	unsigned int eboFullQuad;
-
 	glGenBuffers(1, &eboFullQuad);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 	// set the vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	
 	// Parsing and Creating Shaders
-	std::string vsSource = ParseShader("res/shaders/shader.vs");
-	std::string fsSource = ParseShader("res/shaders/shader.fs");
+	std::string vsSource = ParseShader("res/shaders/shader.vert");
+	std::string fsSource = ParseShader("res/shaders/shader.frag");
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
 	unsigned int program = CreateShader(vs, fs);
-	
 	
 	// main Loop
 	while (!glfwWindowShouldClose(window))
@@ -143,11 +126,11 @@ int main()
 		delta = glfwGetTime() - time;
 		time = glfwGetTime();
 		glfwGetCursorPos(window, &mousePosX, &mousePosY);
-		/*std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
-		std::cout << "Delta Time: " << deltaTime << std::endl;
-		std::cout << "Frame Count: " << frameCount << std::endl;
-		std::cout << "Elapsed Time: " << elapsedTime << std::endl;
-		std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;*/
+		//std::cout << "FPS: " << 1.0f / delta << std::endl;
+		//std::cout << "Delta Time: " << delta << std::endl;
+		//std::cout << "Frame Count: " << frame << std::endl;
+		//std::cout << "Elapsed Time: " << time << std::endl;
+		//std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
 
 		//// glad: render
 		glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
@@ -157,17 +140,13 @@ int main()
 		glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
 		int resoID = glGetUniformLocation(program, "reso");
 		glUniform4f(resoID, width, height, 0.2, 0.0);
+		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 
 		// glad: render custom shader quad
 		glBindVertexArray(vaoFullQuad);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		// glad: render orange triangle
-		glBindVertexArray(VAO1);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		// glad: render yellow triangle
-		glBindVertexArray(VAO2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
 	
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
