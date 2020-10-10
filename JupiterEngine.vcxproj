@@ -142,6 +142,8 @@
     <None Include="res\shaders\shader.geom" />
     <None Include="res\shaders\shader.tese" />
     <None Include="res\shaders\shader.vert" />
+    <None Include="res\shaders\shot.frag" />
+    <None Include="res\shaders\shot.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h" />

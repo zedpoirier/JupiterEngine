@@ -18,8 +18,8 @@ double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 500;
-unsigned int height = 500;
+unsigned int width = 700;
+unsigned int height = 700;
 
 // main is the entry point
 int main() 
@@ -50,19 +50,6 @@ int main()
 
 	std::cout << "Jupiter is rising bitches..." << std::endl;
 
-	float quad[] = {
-		// positions          // colors           // texcoords
-		/**/ -0.8, -0.8, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 0.0, 0.0,
-		/**/ -0.8,  0.8, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
-		/**/  0.8,  0.8, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 1.0, 1.0,
-		/**/  0.8, -0.8, 0.0, /**/ 1.0, 1.0, 1.0, /**/ 1.0, 0.0
-	};
-
-	unsigned int quadIndices[] = {
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
-
 	// stb: load images
 	stbi_set_flip_vertically_on_load(true);
 	int imgWidth, imgHeight, imgNumChannels;
@@ -77,13 +64,28 @@ int main()
 	// stb: free image from memorysx
 	stbi_image_free(data);
 	// repeat for second texture
-	data = stbi_load("res/textures/awesomeface.png", &imgWidth, &imgHeight, &imgNumChannels, 0);
+	data = stbi_load("res/textures/shotEffectIdea.png", &imgWidth, &imgHeight, &imgNumChannels, 0);
 	unsigned int texture1;
 	glGenTextures(1, &texture1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
+
+	float quad[] = {
+		// positions          // colors           // texcoords
+		/**/ -0.8, -0.8, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
+		/**/ -0.8,  0.8, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+		/**/  0.8,  0.8, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
+		/**/  0.8, -0.8, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
+	};
+
+
+	unsigned int quadIndices[] = {
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
+
 
 	// setup vertex array object
 	unsigned int vaoFullQuad;
@@ -106,6 +108,7 @@ int main()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+
 	
 	// Parsing and Creating Shaders
 	std::string vsSource = ParseShader("res/shaders/shader.vert");
@@ -113,6 +116,53 @@ int main()
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
 	unsigned int program = CreateShader(vs, fs);
+
+	// -- // 
+	// New shot small quad
+	// -- //
+
+	float quad2[] = {
+		// positions          // colors           // texcoords
+		/**/ 0.0, -0.3, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
+		/**/ 0.0,  0.3, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+		/**/ 0.3,  0.3, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
+		/**/ 0.3, -0.3, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
+	};
+
+	// setup vertex array object
+	unsigned int vaoShot;
+	glGenVertexArrays(1, &vaoShot);
+	glBindVertexArray(vaoShot);
+	// build and bind vertex buffer object to array object
+	unsigned int vboShot;
+	glGenBuffers(1, &vboShot);
+	glBindBuffer(GL_ARRAY_BUFFER, vboShot);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad2), quad2, GL_STATIC_DRAW);
+	// build and bind element buffer object to array object
+	unsigned int eboShot;
+	glGenBuffers(1, &eboShot);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboShot);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
+	// set the vertex attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+
+	// Parsing and Creating Shaders
+	vsSource = ParseShader("res/shaders/shot.vert");
+	fsSource = ParseShader("res/shaders/shot.frag");
+	vs = vsSource.c_str();
+	fs = fsSource.c_str();
+	unsigned int programShot = CreateShader(vs, fs);
+
+	glm::mat4 trans = glm::mat4(1.0f);
+	trans = glm::rotate(trans, glm::radians(10.0f), glm::vec3(0.0, 0.0, 1.0));
+	trans = glm::scale(trans, glm::vec3(0.9, 1.1, 1.0));
+	trans = glm::translate(trans, glm::vec3(-0.2, 0.05, 0.0));
 	
 	// main Loop
 	while (!glfwWindowShouldClose(window))
@@ -147,7 +197,20 @@ int main()
 		// glad: render custom shader quad
 		glBindVertexArray(vaoFullQuad);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	
+
+		glUseProgram(programShot);
+		timeID = glGetUniformLocation(programShot, "time");
+		glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
+		resoID = glGetUniformLocation(programShot, "reso");
+		glUniform4f(resoID, width, height, 0.2, 0.0);
+		glUniform1i(glGetUniformLocation(programShot, "texture0"), 0);
+		glUniform1i(glGetUniformLocation(programShot, "texture1"), 1);
+		unsigned int transformID = glGetUniformLocation(programShot, "transform");
+		glUniformMatrix4fv(transformID, 1, GL_FALSE, glm::value_ptr(trans));
+
+		glBindVertexArray(vaoShot);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
@@ -177,6 +240,11 @@ static std::string ParseShader(const std::string& filepath)
 {
 	std::string line;
 	std::stringstream ss;
+	/*std::ifstream noise("res/shaders/noise.glsl");
+	while (getline(noise, line))
+	{
+		ss << line << "\n";
+	}*/
 	std::ifstream stream(filepath);
 	while (getline(stream, line))
 	{
