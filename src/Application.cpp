@@ -121,48 +121,48 @@ int main()
 	// New shot small quad
 	// -- //
 
-	float quad2[] = {
-		// positions          // colors           // texcoords
-		/**/ 0.0, -0.3, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
-		/**/ 0.0,  0.3, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
-		/**/ 0.3,  0.3, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
-		/**/ 0.3, -0.3, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
-	};
+	//float quad2[] = {
+	//	// positions          // colors           // texcoords
+	//	/**/ 0.0, -0.3, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
+	//	/**/ 0.0,  0.3, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+	//	/**/ 0.3,  0.3, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
+	//	/**/ 0.3, -0.3, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
+	//};
 
-	// setup vertex array object
-	unsigned int vaoShot;
-	glGenVertexArrays(1, &vaoShot);
-	glBindVertexArray(vaoShot);
-	// build and bind vertex buffer object to array object
-	unsigned int vboShot;
-	glGenBuffers(1, &vboShot);
-	glBindBuffer(GL_ARRAY_BUFFER, vboShot);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quad2), quad2, GL_STATIC_DRAW);
-	// build and bind element buffer object to array object
-	unsigned int eboShot;
-	glGenBuffers(1, &eboShot);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboShot);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
-	// set the vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
+	//// setup vertex array object
+	//unsigned int vaoShot;
+	//glGenVertexArrays(1, &vaoShot);
+	//glBindVertexArray(vaoShot);
+	//// build and bind vertex buffer object to array object
+	//unsigned int vboShot;
+	//glGenBuffers(1, &vboShot);
+	//glBindBuffer(GL_ARRAY_BUFFER, vboShot);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(quad2), quad2, GL_STATIC_DRAW);
+	//// build and bind element buffer object to array object
+	//unsigned int eboShot;
+	//glGenBuffers(1, &eboShot);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboShot);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
+	//// set the vertex attribute pointers
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	//glEnableVertexAttribArray(0);
+	//glEnableVertexAttribArray(1);
+	//glEnableVertexAttribArray(2);
 
 
-	// Parsing and Creating Shaders
-	vsSource = ParseShader("res/shaders/shot.vert");
-	fsSource = ParseShader("res/shaders/shot.frag");
-	vs = vsSource.c_str();
-	fs = fsSource.c_str();
-	unsigned int programShot = CreateShader(vs, fs);
+	//// Parsing and Creating Shaders
+	//vsSource = ParseShader("res/shaders/shot.vert");
+	//fsSource = ParseShader("res/shaders/shot.frag");
+	//vs = vsSource.c_str();
+	//fs = fsSource.c_str();
+	//unsigned int programShot = CreateShader(vs, fs);
 
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::rotate(trans, glm::radians(10.0f), glm::vec3(0.0, 0.0, 1.0));
-	trans = glm::scale(trans, glm::vec3(0.9, 1.1, 1.0));
-	trans = glm::translate(trans, glm::vec3(-0.2, 0.05, 0.0));
+	//glm::mat4 trans = glm::mat4(1.0f);
+	//trans = glm::rotate(trans, glm::radians(10.0f), glm::vec3(0.0, 0.0, 1.0));
+	//trans = glm::scale(trans, glm::vec3(0.2, 1.1, 1.0));
+	//trans = glm::translate(trans, glm::vec3(-0.2, 0.05, 0.0));
 	
 	// main Loop
 	while (!glfwWindowShouldClose(window))
@@ -198,7 +198,7 @@ int main()
 		glBindVertexArray(vaoFullQuad);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glUseProgram(programShot);
+		/*glUseProgram(programShot);
 		timeID = glGetUniformLocation(programShot, "time");
 		glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
 		resoID = glGetUniformLocation(programShot, "reso");
@@ -209,7 +209,7 @@ int main()
 		glUniformMatrix4fv(transformID, 1, GL_FALSE, glm::value_ptr(trans));
 
 		glBindVertexArray(vaoShot);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
 
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

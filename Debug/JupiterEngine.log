@@ -1,16 +1,1 @@
-﻿  Application.cpp
-C:\Dev\JupiterEngine\src\Application.cpp(81,2): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Dev\JupiterEngine\src\Application.cpp(130,2): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Dev\JupiterEngine\src\Application.cpp(190,56): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(190,32): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(190,23): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(192,46): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-C:\Dev\JupiterEngine\src\Application.cpp(192,30): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(192,23): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(203,56): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(203,32): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(203,23): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(205,46): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-C:\Dev\JupiterEngine\src\Application.cpp(205,30): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(205,23): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-  JupiterEngine.vcxproj -> C:\Dev\JupiterEngine\Debug\JupiterEngine.exe
+﻿  JupiterEngine.vcxproj -> C:\Dev\JupiterEngine\Debug\JupiterEngine.exe

@@ -20,13 +20,13 @@ float box(vec2 st, vec2 size)
 void main()
 {
 	vec2 uv = vec2(texcoord.x, texcoord.y - time.x);
-	vec4 color = vec4(box(fract(uv), vec2(0.02, 0.2)));
+	vec4 color = vec4(box(fract(uv), vec2(0.1, 0.2)));
 	vec2 offset1 = vec2(0.2, 0.4);
-	color += vec4(box(fract(uv + offset1), vec2(0.02, 0.2)));
+	color += vec4(box(fract(uv + offset1), vec2(0.1, 0.2)));
 	vec2 offset2 = vec2(-0.3, -0.2);
-	color += vec4(box(fract(uv + offset2), vec2(0.02, 0.2)));
+	color += vec4(box(fract(uv + offset2), vec2(0.1, 0.2)));
 	vec2 offset3 = vec2(0.6, -0.5);
-	color += vec4(box(fract(uv + offset3), vec2(0.02, 0.2)));
+	color += vec4(box(fract(uv + offset3), vec2(0.1, 0.2)));
 	//vec2 offset4 = vec2(-0.8, 0.1);
 	//color += vec4(box(fract(uv + offset4), vec2(0.02, 0.2)));
 	if (color.a < 0.1) discard;

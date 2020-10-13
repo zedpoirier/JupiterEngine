@@ -35,6 +35,8 @@
     <None Include="res\shaders\shader.tese" />
     <None Include="res\shaders\shot.vert" />
     <None Include="res\shaders\shot.frag" />
+    <None Include="res\shaders\noise.glsl" />
+    <None Include="res\shaders\sdf.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h">
