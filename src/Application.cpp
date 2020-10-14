@@ -24,31 +24,10 @@ unsigned int height = 700;
 // main is the entry point
 int main() 
 {
-	// glfw: initialize and configure
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	// glfw: create a window
-	GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL Proto Engine", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-	glfwSetWindowPos(window, 500, 200);
-	// glad: load all OpenGl function pointers
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	std::cout << "Jupiter is rising bitches..." << std::endl;
+	// initialize glfw, create a window and context, initilize glad
+	GLFWwindow* window = initialize();
+	if (window == NULL) return -1; // Failed to initialize
+	std::cout << "Jupiter is rising..." << std::endl;
 
 	// stb: load images
 	stbi_set_flip_vertically_on_load(true);
@@ -74,10 +53,10 @@ int main()
 
 	float quad[] = {
 		// positions          // colors           // texcoords
-		/**/ -0.8, -0.8, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
-		/**/ -0.8,  0.8, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
-		/**/  0.8,  0.8, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
-		/**/  0.8, -0.8, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
+		/**/ -1.0, -1.0, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
+		/**/ -1.0,  1.0, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+		/**/  1.0,  1.0, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
+		/**/  1.0, -1.0, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
 	};
 
 
@@ -117,48 +96,6 @@ int main()
 	const char* fs = fsSource.c_str();
 	unsigned int program = CreateShader(vs, fs);
 
-	// -- // 
-	// New shot small quad
-	// -- //
-
-	//float quad2[] = {
-	//	// positions          // colors           // texcoords
-	//	/**/ 0.0, -0.3, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
-	//	/**/ 0.0,  0.3, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
-	//	/**/ 0.3,  0.3, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
-	//	/**/ 0.3, -0.3, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
-	//};
-
-	//// setup vertex array object
-	//unsigned int vaoShot;
-	//glGenVertexArrays(1, &vaoShot);
-	//glBindVertexArray(vaoShot);
-	//// build and bind vertex buffer object to array object
-	//unsigned int vboShot;
-	//glGenBuffers(1, &vboShot);
-	//glBindBuffer(GL_ARRAY_BUFFER, vboShot);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(quad2), quad2, GL_STATIC_DRAW);
-	//// build and bind element buffer object to array object
-	//unsigned int eboShot;
-	//glGenBuffers(1, &eboShot);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboShot);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
-	//// set the vertex attribute pointers
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(0);
-	//glEnableVertexAttribArray(1);
-	//glEnableVertexAttribArray(2);
-
-
-	//// Parsing and Creating Shaders
-	//vsSource = ParseShader("res/shaders/shot.vert");
-	//fsSource = ParseShader("res/shaders/shot.frag");
-	//vs = vsSource.c_str();
-	//fs = fsSource.c_str();
-	//unsigned int programShot = CreateShader(vs, fs);
-
 	//glm::mat4 trans = glm::mat4(1.0f);
 	//trans = glm::rotate(trans, glm::radians(10.0f), glm::vec3(0.0, 0.0, 1.0));
 	//trans = glm::scale(trans, glm::vec3(0.2, 1.1, 1.0));
@@ -167,72 +104,80 @@ int main()
 	// main Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//TODO process();
-		//TODO render();
-
-		// glfw:: process input
-		frame++;
-		processInput(window);
-		delta = glfwGetTime() - time;
-		time = glfwGetTime();
-		glfwGetCursorPos(window, &mousePosX, &mousePosY);
-		//std::cout << "FPS: " << 1.0f / delta << std::endl;
-		//std::cout << "Delta Time: " << delta << std::endl;
-		//std::cout << "Frame Count: " << frame << std::endl;
-		//std::cout << "Elapsed Time: " << time << std::endl;
-		//std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
-
-		//// glad: render
-		glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(program);
-		int timeID = glGetUniformLocation(program, "time");
-		glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
-		int resoID = glGetUniformLocation(program, "reso");
-		glUniform4f(resoID, width, height, 0.2, 0.0);
-		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
-
-
-		// glad: render custom shader quad
-		glBindVertexArray(vaoFullQuad);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		/*glUseProgram(programShot);
-		timeID = glGetUniformLocation(programShot, "time");
-		glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
-		resoID = glGetUniformLocation(programShot, "reso");
-		glUniform4f(resoID, width, height, 0.2, 0.0);
-		glUniform1i(glGetUniformLocation(programShot, "texture0"), 0);
-		glUniform1i(glGetUniformLocation(programShot, "texture1"), 1);
-		unsigned int transformID = glGetUniformLocation(programShot, "transform");
-		glUniformMatrix4fv(transformID, 1, GL_FALSE, glm::value_ptr(trans));
-
-		glBindVertexArray(vaoShot);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
-
-
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		process(window);
+		render(window, program, vaoFullQuad);	
 	}
-
-	// glfw: terminate, clearing all previously allocated GLFW resources.
 	glfwTerminate();
 	return 0;
+}
+
+GLFWwindow* initialize()
+{
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL Proto Engine", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return NULL;
+	}
+	glfwMakeContextCurrent(window);
+	glfwSetWindowPos(window, 600, 200);
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return NULL;
+	}
+	return window;
+}
+
+// process :: glfwPollEvents
+void process(GLFWwindow * window)
+{
+	frame++;
+	delta = glfwGetTime() - time;
+	time = glfwGetTime();
+	glfwGetCursorPos(window, &mousePosX, &mousePosY);
+	//std::cout << "FPS: " << 1.0f / delta << std::endl;
+	//std::cout << "Delta Time: " << delta << std::endl;
+	//std::cout << "Frame Count: " << frame << std::endl;
+	//std::cout << "Elapsed Time: " << time << std::endl;
+	//std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+
+	glfwPollEvents();
+}
+
+// render :: glfwMakeContextCurrent...glfwSwapBuffers
+void render(GLFWwindow* window, unsigned int program, unsigned int vao)
+{
+	glfwMakeContextCurrent(window);
+	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glUseProgram(program);
+	int frameID = glGetUniformLocation(program, "frame");
+	glUniform1i(frameID, frame);
+	int timeID = glGetUniformLocation(program, "time");
+	glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
+	int resoID = glGetUniformLocation(program, "reso");
+	glUniform4f(resoID, width, height, 0.2, 0.0);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+	glBindVertexArray(vao);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glfwSwapBuffers(window);
 }
 
 // glfw: whenever the window size changes (by OS or user resize) this callback function executes
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-}
-
-// glfw: process all input pressed/released this frame and react accordingly
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
 }
 
 // cherno: parse shader code from a .shader file to a const char*

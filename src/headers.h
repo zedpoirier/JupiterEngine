@@ -13,7 +13,9 @@
 
 
 // prototype functions
-void processInput(GLFWwindow* window);
+GLFWwindow* initialize();
+void process(GLFWwindow * window);
+void render(GLFWwindow* window, unsigned int program, unsigned int vao);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 std::string ParseShader(const std::string& filepath);
 unsigned int CompileShader(unsigned int type, const char* shaderSource);

@@ -3,6 +3,8 @@
 
  References:
 
+ https://learnopengl.com/
+ https://thebookofshaders.com/
  https://github.com/sungiant/sdf
  https://www.iquilezles.org/www/articles/boxfunctions/boxfunctions.htm
 

@@ -6,6 +6,7 @@ layout(location = 2) in vec2 vTexcoord;
 out vec3 color;
 out vec2 texcoord;
 
+uniform int frame;
 uniform vec4 time;
 
 void main()
