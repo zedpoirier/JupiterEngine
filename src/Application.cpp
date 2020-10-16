@@ -144,11 +144,13 @@ void process(GLFWwindow * window)
 	glfwGetCursorPos(window, &mousePosX, &mousePosY);
 	//std::cout << "FPS: " << 1.0f / delta << std::endl;
 	//std::cout << "Delta Time: " << delta << std::endl;
-	//std::cout << "Frame Count: " << frame << std::endl;
+	std::cout << "Frame Count: " << frame << std::endl;
 	//std::cout << "Elapsed Time: " << time << std::endl;
 	//std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	else if (glfwGetKey(window, GLFW_KEY_KP_0) == GLFW_PRESS)
+		frame = 0;
 
 
 	glfwPollEvents();

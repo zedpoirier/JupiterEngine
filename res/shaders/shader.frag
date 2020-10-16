@@ -6,53 +6,36 @@ out vec4 FragColor;
 
 uniform sampler2D texture0;
 uniform sampler2D texture1;
+uniform int frame;
 uniform vec4 time;
 uniform vec4 reso;
 
-float sdfCircle(vec2 p, float radius)
+float easeIn(float val)
 {
-	vec2 q = abs(p) - radius;
-	float dist = length(p) - radius;
-	return dist;
+	float c4 = (2 * 3.14) / 3;
+	return -pow(2, 10 * val - 10) * sin((val * 10 - 10.75) * c4);
 }
 
-float ringDots(vec2 p, float count, float radius, float size, float speed)
+float beam(vec2 p, float width, float phase, float amplitude)
 {
-	p *= mat2(cos(time.x * speed), -sin(time.x * speed),
-			  sin(time.x * speed),  cos(time.x * speed));
-	float angle = 6.283185 / count;
-	float sector = round(atan(p.x, p.y) / angle);
-	float an = sector * angle;
-	p *= mat2(cos(an), -sin(an),
-			  sin(an),  cos(an));
-	p -= vec2(0.0, radius); // translate
-	return sdfCircle(p, size);
+	return smoothstep(width + sin(p.y * phase) * amplitude, 0.02, abs(p.x));
 }
 
 void main()
 {
     vec2 p = texcoord - 0.5; // center
-	vec2 q = p;
-    
-	float d6 = ringDots(p, 64.0, 0.48, 0.005, 1.0);
-	float d5 = ringDots(q, 32.0, 0.4, 0.008 , 1.0);
-	float d4 = ringDots(p, 16.0, 0.3, 0.01, 1.0);
-	float d3 = ringDots(q, 8.0, 0.2, 0.02 , 1.0);
-	float d2 = ringDots(p, 4.0, 0.1, 0.03  , 1.0);
-	float d1 = 100000;
-	float d = min(min(min(min(min(d1, d2), d3), d4), d5), d6);
-	vec3 dots = vec3(step(d, 0.0));
-	//FragColor = vec4(vec3(dots), 1.0);
 
-	float x = 1.0;
-	float y = 19.0;
-	float z = 71.0;
-	float r = ringDots(p, 12.0, 0.3, 0.03, 1.0);
-	float g = ringDots(p, 12.0, 0.3, 0.02, 1.1);
-	float b = ringDots(p, 12.0, 0.3, 0.04, 1.2 );
-	float red = step(r, 0);
-	float green = step(g, 0.0);
-	float blue = step(b, 0.0);
-	FragColor = vec4(red, green, blue, 1.0);
+	p *= mat2(easeIn((frame / 20.1) + 0.9), 0.0, 0.0, 1.0);
+
+	float b1 = beam(vec2(p.x, p.y - time.x * 1.0), 0.2, 50.0, 0.01);
+	float b2 = beam(vec2(p.x, p.y - time.x * 1.2), 0.21, 40.0, 0.01);
+	float b3 = beam(vec2(p.x, p.y - time.x * 1.3), 0.1, 30.0, 0.02);
+	p *= mat2(2.0, 0.0, 0.0, 1.0);
+	float b4 = beam(vec2(p.x, p.y - time.x * 1.4), 0.05, 20.0, 0.02);
+	p *= mat2(2.0, 0.0, 0.0, 1.0);
+	float b5 = beam(vec2(p.x, p.y - time.x * 1.5), 0.05, 10.0, 0.02);
+	vec3 color = vec3(0.2, 1.0, 1.0);
+	vec3 final = vec3(min(b1, b2)) * color + vec3(b3) * 0.2 + vec3(b4) * 0.3 + vec3(b5) * 0.3;
+	FragColor = vec4(final, 1.0);
 };
 

@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="res\shaders\dots.frag" />
     <None Include="res\shaders\FS.shader" />
     <None Include="res\shaders\noise.glsl" />
     <None Include="res\shaders\sdf.frag" />

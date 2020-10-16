@@ -1,9 +1,8 @@
 ﻿  Application.cpp
-C:\Dev\JupiterEngine\src\Application.cpp(173,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(173,31): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(173,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(175,45): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-C:\Dev\JupiterEngine\src\Application.cpp(175,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(175,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+C:\Dev\JupiterEngine\src\Application.cpp(169,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(169,31): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(169,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(171,45): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Dev\JupiterEngine\src\Application.cpp(171,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(171,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
   JupiterEngine.vcxproj -> C:\Dev\JupiterEngine\Debug\JupiterEngine.exe
