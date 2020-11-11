@@ -1,8 +1,8 @@
 ﻿  Application.cpp
-C:\Dev\JupiterEngine\src\Application.cpp(169,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(169,31): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(169,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(171,45): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-C:\Dev\JupiterEngine\src\Application.cpp(171,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(171,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(225,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(225,31): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(225,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(226,45): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Dev\JupiterEngine\src\Application.cpp(226,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(226,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
   JupiterEngine.vcxproj -> C:\Dev\JupiterEngine\Debug\JupiterEngine.exe

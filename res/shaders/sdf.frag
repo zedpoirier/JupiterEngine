@@ -31,6 +31,16 @@ float sdfSphere(vec3 p, float radius)
 	return dist;
 }
 
+float sdfRing(vec2 p, float radius, float halfThickness)
+{
+	return abs(length(p) - radius) - halfThickness;
+}
+
+float sdfCircle(vec2 p, float radius)
+{
+	return length(p) - radius;
+}
+
 vec4 lasers()
 {
 	vec4 final = vec4(1.0, 1.0, 0.0, 1.0);
@@ -39,9 +49,29 @@ vec4 lasers()
 	return final;
 }
 
+float sdVesica(vec2 p, float r, float d)
+{
+    p = abs(p);
+    float b = sqrt(r*r-d*d);
+    return ((p.y-b)*d>p.x*b) ? length(p-vec2(0.0,b))
+                             : length(p-vec2(-d,0.0))-r;
+}
+
+float sdRhombus( in vec2 p, in vec2 b ) 
+{
+    vec2 q = abs(p);
+    float h = clamp((-2.0*dot(q,b)+dot(b,b))/dot(b,b),-1.0,1.0);
+    float d = length( q - 0.5*b*vec2(1.0-h,1.0+h) );
+    return d * sign( q.x*b.y + q.y*b.x - b.x*b.y );
+}
+
 void main()
 {
-    vec2 uv = texcoord;
-	FragColor = vec4(step(sdfSphere(vec3(uv.xy - 0.5, abs(sin(time.x)) * 0.5 ), 0.3), 0.0));
+    vec2 uv = texcoord - 0.5;
+	//FragColor = vec4(step(sdfSphere(vec3(uv.xy - 0.5, abs(sin(time.x)) * 0.5 ), 0.3), 0.0));
+	//FragColor = vec4(1.0 - sdfCircle(uv, -0.6));
+	vec4 color = vec4(step(sdRhombus(uv, vec2(0.15, 0.4)), 0.0));
+	//color += step(sdfCircle(vec2(uv.x, uv.y - 0.3), 0.05), 0.0);
+	FragColor = color;
 };
 

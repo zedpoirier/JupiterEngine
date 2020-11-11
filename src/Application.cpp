@@ -18,8 +18,8 @@ double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 700;
-unsigned int height = 700;
+unsigned int width = 1200;
+unsigned int height = 600;
 
 // main is the entry point
 int main() 
@@ -27,7 +27,7 @@ int main()
 	// initialize glfw, create a window and context, initilize glad
 	GLFWwindow* window = initialize();
 	if (window == NULL) return -1; // Failed to initialize
-	std::cout << "Jupiter is rising..." << std::endl;
+	std::cout << "Jupiter is rising bitches..." << std::endl;
 
 	// stb: load images
 	stbi_set_flip_vertically_on_load(true);
@@ -43,7 +43,7 @@ int main()
 	// stb: free image from memorysx
 	stbi_image_free(data);
 	// repeat for second texture
-	data = stbi_load("res/textures/shotEffectIdea.png", &imgWidth, &imgHeight, &imgNumChannels, 0);
+	data = stbi_load("res/textures/awesomeface.png", &imgWidth, &imgHeight, &imgNumChannels, 0);
 	unsigned int texture1;
 	glGenTextures(1, &texture1);
 	glActiveTexture(GL_TEXTURE1);
@@ -53,10 +53,10 @@ int main()
 
 	float quad[] = {
 		// positions          // colors           // texcoords
-		/**/ -1.0, -1.0, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
-		/**/ -1.0,  1.0, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
-		/**/  1.0,  1.0, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
-		/**/  1.0, -1.0, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
+		/**/ 0.0, -1.0, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
+		/**/ 0.0,  1.0, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+		/**/ 1.0,  1.0, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
+		/**/ 1.0, -1.0, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
 	};
 
 
@@ -91,23 +91,61 @@ int main()
 	
 	// Parsing and Creating Shaders
 	std::string vsSource = ParseShader("res/shaders/shader.vert");
-	std::string fsSource = ParseShader("res/shaders/shader.frag");
+	std::string fsSource = ParseShader("res/shaders/noise.frag");
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
 	unsigned int program = CreateShader(vs, fs);
 
-	//glm::mat4 trans = glm::mat4(1.0f);
-	//trans = glm::rotate(trans, glm::radians(10.0f), glm::vec3(0.0, 0.0, 1.0));
-	//trans = glm::scale(trans, glm::vec3(0.2, 1.1, 1.0));
-	//trans = glm::translate(trans, glm::vec3(-0.2, 0.05, 0.0));
+	// coordinate system matrices setup
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), (float)(width / height), 0.1f, 100.0f);
 	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	// Setup Platform/Renderer bindings
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+
 	// main Loop
 	while (!glfwWindowShouldClose(window))
 	{
 		process(window);
+
+		// feed inputs to dear imgui, start new frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		//ImGui::ShowDemoWindow();
+
+		// shader uniforms
+		int modelID = glGetUniformLocation(program, "model");
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
+		int viewID = glGetUniformLocation(program, "view");
+		glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
+		int projID = glGetUniformLocation(program, "projection");
+		glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
+
+		// render geometry and gui
 		render(window, program, vaoFullQuad);	
 	}
 	glfwTerminate();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 	return 0;
 }
 
@@ -125,7 +163,7 @@ GLFWwindow* initialize()
 		return NULL;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSetWindowPos(window, 600, 200);
+	//glfwSetWindowPos(window, 0, 0);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -144,7 +182,7 @@ void process(GLFWwindow * window)
 	glfwGetCursorPos(window, &mousePosX, &mousePosY);
 	//std::cout << "FPS: " << 1.0f / delta << std::endl;
 	//std::cout << "Delta Time: " << delta << std::endl;
-	std::cout << "Frame Count: " << frame << std::endl;
+	//std::cout << "Frame Count: " << frame << std::endl;
 	//std::cout << "Elapsed Time: " << time << std::endl;
 	//std::cout << "Mouse position X: " << mousePosX << " Y: " << mousePosY << std::endl;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -163,16 +201,39 @@ void render(GLFWwindow* window, unsigned int program, unsigned int vao)
 	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(program);
+	
+	// render your GUI
+	ImGui::Begin("Noise Colors");
+	static float color1[3] = { 1.0, 0.0, 0.0 };
+	static float color2[3] = { 0.0, 1.0, 0.0 };
+	static float color3[3] = { 0.0, 0.0, 1.0 };
+	ImGui::ColorEdit3("Color 1", color1);
+	ImGui::ColorEdit3("Color 2", color2);
+	ImGui::ColorEdit3("Color 3", color3);
+	int c1ID = glGetUniformLocation(program, "col1");
+	int c2ID = glGetUniformLocation(program, "col2");
+	int c3ID = glGetUniformLocation(program, "col3");
+	glUniform3f(c1ID, color1[0], color1[1], color1[2]);
+	glUniform3f(c2ID, color2[0], color2[1], color2[2]);
+	glUniform3f(c3ID, color3[0], color3[1], color3[2]);
+	ImGui::End();
+
 	int frameID = glGetUniformLocation(program, "frame");
-	glUniform1i(frameID, frame);
 	int timeID = glGetUniformLocation(program, "time");
-	glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
 	int resoID = glGetUniformLocation(program, "reso");
+	glUniform1i(frameID, frame);
+	glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
 	glUniform4f(resoID, width, height, 0.2, 0.0);
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+	// Render dear imgui into screen
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	glfwSwapBuffers(window);
 }
 

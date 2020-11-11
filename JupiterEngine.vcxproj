@@ -131,6 +131,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dependencies\glad\src\glad.c" />
+    <ClCompile Include="dependencies\imgui\imgui.cpp" />
+    <ClCompile Include="dependencies\imgui\imgui_demo.cpp" />
+    <ClCompile Include="dependencies\imgui\imgui_draw.cpp" />
+    <ClCompile Include="dependencies\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="dependencies\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="dependencies\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Shaders.cpp" />
   </ItemGroup>
@@ -138,7 +144,8 @@
     <None Include="packages.config" />
     <None Include="res\shaders\dots.frag" />
     <None Include="res\shaders\FS.shader" />
-    <None Include="res\shaders\noise.glsl" />
+    <None Include="res\shaders\laser.frag" />
+    <None Include="res\shaders\noise.frag" />
     <None Include="res\shaders\sdf.frag" />
     <None Include="res\shaders\shader.comp" />
     <None Include="res\shaders\shader.frag" />
@@ -149,6 +156,14 @@
     <None Include="res\shaders\shot.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dependencies\imgui\imconfig.h" />
+    <ClInclude Include="dependencies\imgui\imgui.h" />
+    <ClInclude Include="dependencies\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="dependencies\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="dependencies\imgui\imgui_internal.h" />
+    <ClInclude Include="dependencies\imgui\imstb_rectpack.h" />
+    <ClInclude Include="dependencies\imgui\imstb_textedit.h" />
+    <ClInclude Include="dependencies\imgui\imstb_truetype.h" />
     <ClInclude Include="src\headers.h" />
     <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
@@ -156,6 +171,9 @@
     <Image Include="res\textures\awesomeface.png" />
     <Image Include="res\textures\container.jpg" />
     <Image Include="res\textures\EBITS002.dds" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="dependencies\imgui\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,9 +9,13 @@ out vec2 texcoord;
 uniform int frame;
 uniform vec4 time;
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 void main()
 {
 	color = vColor;
 	texcoord = vTexcoord;
-	gl_Position = vec4(vPos, 1.0);
+	gl_Position = /*projection * view * model */ vec4(vPos, 1.0);
 };
