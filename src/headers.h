@@ -7,6 +7,8 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_impl_glfw.h>
+#include <Camera.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -14,12 +16,21 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+enum DemoType {
+	FULLSCREEN,
+	CUBES
+};
+
 
 // prototype functions
 GLFWwindow* initialize();
 void process(GLFWwindow * window);
 void render(GLFWwindow* window, unsigned int program, unsigned int vao);
+void tutRender(GLFWwindow* window, unsigned int program, unsigned int vao);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 std::string ParseShader(const std::string& filepath);
 unsigned int CompileShader(unsigned int type, const char* shaderSource);
 unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader);

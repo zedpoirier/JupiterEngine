@@ -13,13 +13,97 @@
 */
 
 // settings
+DemoType type = FULLSCREEN;
+bool showGUI = false;
 double time = 0.0;
 double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 1200;
-unsigned int height = 600;
+unsigned int width = 500;
+unsigned int height = 500;
+
+// matrices
+glm::mat4 view;
+glm::mat4 model;
+glm::mat4 projection;
+
+// camera
+Camera cam = Camera(glm::vec3(0.0f, 0.0f, 5.0f));
+float lastX = width / 2.0f;
+float lastY = height / 2.0f;
+bool firstMouse = true;
+
+float quad[] = {
+	// positions          // colors           // texcoords
+	/**/ -1.0, -1.0, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
+	/**/ -1.0,  1.0, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
+	/**/  1.0,  1.0, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
+	/**/  1.0, -1.0, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
+};
+
+unsigned int quadIndices[] = {
+	0, 1, 3,   // first triangle
+	1, 2, 3    // second triangle
+};
+
+glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
+float cube[] = {
+	// positions          // texcoords
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
 
 // main is the entry point
 int main() 
@@ -50,65 +134,10 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, texture1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	float quad[] = {
-		// positions          // colors           // texcoords
-		/**/ 0.0, -1.0, 0.0, /**/ 0.0, 0.0, 1.0, /**/ 0.0, 0.0,
-		/**/ 0.0,  1.0, 0.0, /**/ 0.0, 1.0, 0.0, /**/ 0.0, 1.0,
-		/**/ 1.0,  1.0, 0.0, /**/ 1.0, 1.0, 0.0, /**/ 1.0, 1.0,
-		/**/ 1.0, -1.0, 0.0, /**/ 1.0, 0.0, 0.0, /**/ 1.0, 0.0
-	};
-
-
-	unsigned int quadIndices[] = {
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
-
-
-	// setup vertex array object
-	unsigned int vaoFullQuad;
-	glGenVertexArrays(1, &vaoFullQuad);
-	glBindVertexArray(vaoFullQuad);
-	// build and bind vertex buffer object to array object
-	unsigned int vboFullQuad;
-	glGenBuffers(1, &vboFullQuad);
-	glBindBuffer(GL_ARRAY_BUFFER, vboFullQuad);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
-	// build and bind element buffer object to array object
-	unsigned int eboFullQuad;
-	glGenBuffers(1, &eboFullQuad);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
-	// set the vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	
-	// Parsing and Creating Shaders
-	std::string vsSource = ParseShader("res/shaders/shader.vert");
-	std::string fsSource = ParseShader("res/shaders/noise.frag");
-	const char* vs = vsSource.c_str();
-	const char* fs = fsSource.c_str();
-	unsigned int program = CreateShader(vs, fs);
-
-	// coordinate system matrices setup
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
-
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), (float)(width / height), 0.1f, 100.0f);
-	
+	// openGL function and settings
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -120,6 +149,49 @@ int main()
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 
+	// setup for FULLSCREEN render
+	unsigned int vaoFullQuad;
+	glGenVertexArrays(1, &vaoFullQuad);
+	glBindVertexArray(vaoFullQuad);
+	unsigned int vboFullQuad;
+	glGenBuffers(1, &vboFullQuad);
+	glBindBuffer(GL_ARRAY_BUFFER, vboFullQuad);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+	unsigned int eboFullQuad;
+	glGenBuffers(1, &eboFullQuad);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	std::string vsSource = ParseShader("res/shaders/fullscreen.vert");
+	std::string fsSource = ParseShader("res/shaders/noise.frag");
+	const char* vs = vsSource.c_str();
+	const char* fs = fsSource.c_str();
+	unsigned int program = CreateShader(vs, fs);
+
+	// setup for CUBES render
+	unsigned int vaoCube;
+	glGenVertexArrays(1, &vaoCube);
+	glBindVertexArray(vaoCube);
+	unsigned int vboCube;
+	glGenBuffers(1, &vboCube);
+	glBindBuffer(GL_ARRAY_BUFFER, vboCube);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	std::string vsSource2 = ParseShader("res/shaders/shader.vert");
+	std::string fsSource2 = ParseShader("res/shaders/shader.frag");
+	const char* vs2 = vsSource2.c_str();
+	const char* fs2 = fsSource2.c_str();
+	unsigned int program2 = CreateShader(vs2, fs2);
+
+
 	// main Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -129,18 +201,17 @@ int main()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		//ImGui::ShowDemoWindow();
 
-		// shader uniforms
-		int modelID = glGetUniformLocation(program, "model");
-		glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
-		int viewID = glGetUniformLocation(program, "view");
-		glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
-		int projID = glGetUniformLocation(program, "projection");
-		glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
-
-		// render geometry and gui
-		render(window, program, vaoFullQuad);	
+		// render geometry and gui based on DemoType
+		switch (type)
+		{
+		case FULLSCREEN:
+			render(window, program, vaoFullQuad);
+			break;
+		case CUBES:
+			tutRender(window, program2, vaoCube);
+			break;
+		}
 	}
 	glfwTerminate();
 	ImGui_ImplOpenGL3_Shutdown();
@@ -163,8 +234,12 @@ GLFWwindow* initialize()
 		return NULL;
 	}
 	glfwMakeContextCurrent(window);
-	//glfwSetWindowPos(window, 0, 0);
+	glfwSetWindowPos(window, 300, 300);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+	glfwSetKeyCallback(window, key_callback);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -190,6 +265,16 @@ void process(GLFWwindow * window)
 	else if (glfwGetKey(window, GLFW_KEY_KP_0) == GLFW_PRESS)
 		frame = 0;
 
+	// camera movement
+	float cameraSpeed = 2.5f * delta; // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cam.ProcessKeyboard(FORWARD, delta);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cam.ProcessKeyboard(BACKWARD, delta);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cam.ProcessKeyboard(LEFT, delta);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cam.ProcessKeyboard(RIGHT, delta);
 
 	glfwPollEvents();
 }
@@ -199,48 +284,171 @@ void render(GLFWwindow* window, unsigned int program, unsigned int vao)
 {
 	glfwMakeContextCurrent(window);
 	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
 	
-	// render your GUI
-	ImGui::Begin("Noise Colors");
+	// color uniforms for gui test and nosie shader
 	static float color1[3] = { 1.0, 0.0, 0.0 };
 	static float color2[3] = { 0.0, 1.0, 0.0 };
 	static float color3[3] = { 0.0, 0.0, 1.0 };
-	ImGui::ColorEdit3("Color 1", color1);
-	ImGui::ColorEdit3("Color 2", color2);
-	ImGui::ColorEdit3("Color 3", color3);
 	int c1ID = glGetUniformLocation(program, "col1");
 	int c2ID = glGetUniformLocation(program, "col2");
 	int c3ID = glGetUniformLocation(program, "col3");
 	glUniform3f(c1ID, color1[0], color1[1], color1[2]);
 	glUniform3f(c2ID, color2[0], color2[1], color2[2]);
 	glUniform3f(c3ID, color3[0], color3[1], color3[2]);
-	ImGui::End();
 
+	// common uniforms
 	int frameID = glGetUniformLocation(program, "frame");
 	int timeID = glGetUniformLocation(program, "time");
 	int resoID = glGetUniformLocation(program, "reso");
 	glUniform1i(frameID, frame);
-	glUniform4f(timeID, time, sin(time), sin(time) * 0.5 + 0.5, 0.0);
-	glUniform4f(resoID, width, height, 0.2, 0.0);
+	glUniform1f(timeID, time);
+	glUniform2f(resoID, width, height);
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+	
+	// bind vao and render elements
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-
-	// Render dear imgui into screen
+	// render your GUI
+	if (showGUI)
+	{
+		// setup GUI
+		ImGui::Begin("Noise Colors");
+		ImGui::ColorEdit3("Color 1", color1);
+		ImGui::ColorEdit3("Color 2", color2);
+		ImGui::ColorEdit3("Color 3", color3);
+		ImGui::End();
+	}
+	// render GUI
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	glfwSwapBuffers(window);
 }
 
+// render :: glfwMakeContextCurrent...glfwSwapBuffers
+void tutRender(GLFWwindow* window, unsigned int program, unsigned int vao)
+{
+	glfwMakeContextCurrent(window);
+	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(program);
+
+	// shader matrix uniforms
+	view = cam.GetViewMatrix();
+	model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+projection = glm::perspective(glm::radians(cam.Zoom), (float)(width / height), 0.1f, 100.0f);
+int viewID = glGetUniformLocation(program, "view");
+int modelID = glGetUniformLocation(program, "model");
+int projID = glGetUniformLocation(program, "projection");
+glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
+glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
+
+// color uniforms for gui test and nosie shader
+static float color1[3] = { 1.0, 0.0, 0.0 };
+static float color2[3] = { 0.0, 1.0, 0.0 };
+static float color3[3] = { 0.0, 0.0, 1.0 };
+int c1ID = glGetUniformLocation(program, "col1");
+int c2ID = glGetUniformLocation(program, "col2");
+int c3ID = glGetUniformLocation(program, "col3");
+glUniform3f(c1ID, color1[0], color1[1], color1[2]);
+glUniform3f(c2ID, color2[0], color2[1], color2[2]);
+glUniform3f(c3ID, color3[0], color3[1], color3[2]);
+
+// common uniforms
+int frameID = glGetUniformLocation(program, "frame");
+int timeID = glGetUniformLocation(program, "time");
+int resoID = glGetUniformLocation(program, "reso");
+glUniform1i(frameID, frame);
+glUniform1f(timeID, time);
+glUniform2f(resoID, width, height);
+glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+
+
+glBindVertexArray(vao);
+for (unsigned int i = 0; i < 10; i++)
+{
+	glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+	// calculate the model matrix for each object and pass it to shader before drawing
+	model = glm::translate(model, cubePositions[i]);
+	float angle = 20.0f * i;
+	if ((i + 1) % 2 == 0)
+		angle = glfwGetTime() * 20.0f * i;
+	model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+	glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+// render your GUI
+if (showGUI)
+{
+	// setup GUI
+	ImGui::Begin("Noise Colors");
+	ImGui::ColorEdit3("Color 1", color1);
+	ImGui::ColorEdit3("Color 2", color2);
+	ImGui::ColorEdit3("Color 3", color3);
+	ImGui::End();
+}
+// render GUI
+ImGui::Render();
+ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+glfwSwapBuffers(window);
+}
+
 // glfw: whenever the window size changes (by OS or user resize) this callback function executes
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+// glfw: whenever the mouse moves, this callback is called
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+	lastX = xpos;
+	lastY = ypos;
+
+	cam.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	cam.ProcessMouseScroll(yoffset);
+}
+
+// glfw: whenever a key is pressed a single time "BUTTONDOWN" 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		showGUI = !showGUI;
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	{
+		type = FULLSCREEN;
+		// tell GLFW to capture our mouse
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	{
+		type = CUBES;
+		// tell GLFW to capture our mouse
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 }
 
 // cherno: parse shader code from a .shader file to a const char*

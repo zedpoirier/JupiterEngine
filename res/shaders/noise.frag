@@ -7,8 +7,8 @@ out vec4 FragColor;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 uniform int frame;
-uniform vec4 time;
-uniform vec4 reso;
+uniform float time;
+uniform vec2 reso;
 uniform vec3 col1;
 uniform vec3 col2;
 uniform vec3 col3;
@@ -186,7 +186,7 @@ float snoise(vec3 v)
 }
 
 //-----------------------------------------------
-// Fractal Noise for SL
+// Fractal Componded Noise from Sebastion League
 //-----------------------------------------------
 
 float fractalNoise(vec2 p, int depth)
@@ -223,11 +223,14 @@ float fractalNoise(vec3 p, int depth)
 
 void main()
 {
-    vec2 p = texcoord * reso.xy/reso.y;
-	p *= 2.0;
-	vec3 q = vec3(p.x, p.y, time * 0.008);
+    vec2 p = texcoord - 0.5;
+
+	//float spin = frame * 0.08 * length(p);
+	float spin = sin( (frame - (200.5*length(p))) * 0.02);
+	p *= mat2(cos(spin), -sin(spin),
+			  sin(spin), cos(spin));
+	vec3 q = vec3(p.x, p.y, time * 0.04);
 	vec3 n = vec3(fractalNoise(q, 5));
-	vec3 nspace = vec3(fractalNoise(q + n, 3));
 
 	vec3 w1 = vec3(fractalNoise(q + vec3(0.0, 0.0, 0.0), 3),
 				   fractalNoise(q + vec3(5.2, 1.3, 3.6), 3),
@@ -243,7 +246,7 @@ void main()
 	vec3 col = vec3(f);
 		col = mix( col, col1, w2.x );
 		col = mix( col, col2, w2.y );
-		col = mix( col, col3, w2.z );
+		col = mix( col, col3, w1.x );
 		col *= f *2.0;
 
 	FragColor = vec4(col, 1.0);

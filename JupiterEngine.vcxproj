@@ -164,6 +164,7 @@
     <ClInclude Include="dependencies\imgui\imstb_rectpack.h" />
     <ClInclude Include="dependencies\imgui\imstb_textedit.h" />
     <ClInclude Include="dependencies\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\headers.h" />
     <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
