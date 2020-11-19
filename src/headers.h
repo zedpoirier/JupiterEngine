@@ -18,15 +18,17 @@
 
 enum DemoType {
 	FULLSCREEN,
-	CUBES
+	CUBES,
+	RAYMARCH
 };
 
 
 // prototype functions
 GLFWwindow* initialize();
 void process(GLFWwindow * window);
-void render(GLFWwindow* window, unsigned int program, unsigned int vao);
-void tutRender(GLFWwindow* window, unsigned int program, unsigned int vao);
+void renderFULLSCREEN(GLFWwindow* window, unsigned int program, unsigned int vao);
+void renderCUBES(GLFWwindow* window, unsigned int program, unsigned int vao);
+void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);

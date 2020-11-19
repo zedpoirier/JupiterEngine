@@ -10,18 +10,25 @@
 	graphics:
 	https://twitter.com/algomystic/status/1306634253153775616
 	https://twitter.com/FreyaHolmer/status/1264248161926893568
+
+	save to file:
+	https://stackoverflow.com/questions/3191978/how-to-use-glut-opengl-to-render-to-a-file
+	http://netpbm.sourceforge.net/doc/ppm.html#:~:text=The%20PPM%20format%20is%20a%20lowest%20common%20denominator%20color%20image%20file%20format.&text=For%20example%2C%20%22PPM%20using%20the,also%20called%20%22portable%20pixmaps.%22
+	https://eklitzke.org/rendering-videos-from-opengl
+	http://jamie-wong.com/2016/07/15/ray-marching-signed-distance-functions/#the-raymarching-algorithm
+	https://www.youtube.com/watch?v=Cfe5UQ-1L9Q&t=3233s
 */
 
 // settings
-DemoType type = FULLSCREEN;
+DemoType type = RAYMARCH;
 bool showGUI = false;
 double time = 0.0;
 double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 500;
-unsigned int height = 500;
+unsigned int width = 800;
+unsigned int height = 600;
 
 // matrices
 glm::mat4 view;
@@ -29,7 +36,7 @@ glm::mat4 model;
 glm::mat4 projection;
 
 // camera
-Camera cam = Camera(glm::vec3(0.0f, 0.0f, 5.0f));
+Camera cam = Camera(glm::vec3(0.0f, 1.0f, 5.0f));
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
 bool firstMouse = true;
@@ -191,6 +198,13 @@ int main()
 	const char* fs2 = fsSource2.c_str();
 	unsigned int program2 = CreateShader(vs2, fs2);
 
+	// setup for RAYMARCH render
+	std::string vsSource3 = ParseShader("res/shaders/raymarching.vert");
+	std::string fsSource3 = ParseShader("res/shaders/raymarching.frag");
+	const char* vs3 = vsSource3.c_str();
+	const char* fs3 = fsSource3.c_str();
+	unsigned int program3 = CreateShader(vs3, fs3);
+
 
 	// main Loop
 	while (!glfwWindowShouldClose(window))
@@ -206,10 +220,13 @@ int main()
 		switch (type)
 		{
 		case FULLSCREEN:
-			render(window, program, vaoFullQuad);
+			renderFULLSCREEN(window, program, vaoFullQuad);
 			break;
 		case CUBES:
-			tutRender(window, program2, vaoCube);
+			renderCUBES(window, program2, vaoCube);
+			break;
+		case RAYMARCH:
+			renderRAYMARCH(window, program3, vaoFullQuad);
 			break;
 		}
 	}
@@ -275,12 +292,16 @@ void process(GLFWwindow * window)
 		cam.ProcessKeyboard(LEFT, delta);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cam.ProcessKeyboard(RIGHT, delta);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		cam.ProcessKeyboard(UP, delta);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		cam.ProcessKeyboard(DOWN, delta);
 
 	glfwPollEvents();
 }
 
 // render :: glfwMakeContextCurrent...glfwSwapBuffers
-void render(GLFWwindow* window, unsigned int program, unsigned int vao)
+void renderFULLSCREEN(GLFWwindow* window, unsigned int program, unsigned int vao)
 {
 	glfwMakeContextCurrent(window);
 	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
@@ -330,7 +351,7 @@ void render(GLFWwindow* window, unsigned int program, unsigned int vao)
 }
 
 // render :: glfwMakeContextCurrent...glfwSwapBuffers
-void tutRender(GLFWwindow* window, unsigned int program, unsigned int vao)
+void renderCUBES(GLFWwindow* window, unsigned int program, unsigned int vao)
 {
 	glfwMakeContextCurrent(window);
 	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
@@ -340,65 +361,96 @@ void tutRender(GLFWwindow* window, unsigned int program, unsigned int vao)
 	// shader matrix uniforms
 	view = cam.GetViewMatrix();
 	model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-projection = glm::perspective(glm::radians(cam.Zoom), (float)(width / height), 0.1f, 100.0f);
-int viewID = glGetUniformLocation(program, "view");
-int modelID = glGetUniformLocation(program, "model");
-int projID = glGetUniformLocation(program, "projection");
-glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
-glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
-
-// color uniforms for gui test and nosie shader
-static float color1[3] = { 1.0, 0.0, 0.0 };
-static float color2[3] = { 0.0, 1.0, 0.0 };
-static float color3[3] = { 0.0, 0.0, 1.0 };
-int c1ID = glGetUniformLocation(program, "col1");
-int c2ID = glGetUniformLocation(program, "col2");
-int c3ID = glGetUniformLocation(program, "col3");
-glUniform3f(c1ID, color1[0], color1[1], color1[2]);
-glUniform3f(c2ID, color2[0], color2[1], color2[2]);
-glUniform3f(c3ID, color3[0], color3[1], color3[2]);
-
-// common uniforms
-int frameID = glGetUniformLocation(program, "frame");
-int timeID = glGetUniformLocation(program, "time");
-int resoID = glGetUniformLocation(program, "reso");
-glUniform1i(frameID, frame);
-glUniform1f(timeID, time);
-glUniform2f(resoID, width, height);
-glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+	projection = glm::perspective(glm::radians(cam.Zoom), (float)(width / height), 0.1f, 100.0f);
+	int viewID = glGetUniformLocation(program, "view");
+	int modelID = glGetUniformLocation(program, "model");
+	int projID = glGetUniformLocation(program, "projection");
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
+	
+	// common uniforms
+	int frameID = glGetUniformLocation(program, "frame");
+	int timeID = glGetUniformLocation(program, "time");
+	int resoID = glGetUniformLocation(program, "reso");
+	glUniform1i(frameID, frame);
+	glUniform1f(timeID, time);
+	glUniform2f(resoID, width, height);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 
-glBindVertexArray(vao);
-for (unsigned int i = 0; i < 10; i++)
-{
-	glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-	// calculate the model matrix for each object and pass it to shader before drawing
-	model = glm::translate(model, cubePositions[i]);
-	float angle = 20.0f * i;
-	if ((i + 1) % 2 == 0)
-		angle = glfwGetTime() * 20.0f * i;
-	model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-	glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
+	glBindVertexArray(vao);
+	for (unsigned int i = 0; i < 10; i++)
+	{
+		glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+		// calculate the model matrix for each object and pass it to shader before drawing
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 20.0f * i;
+		if ((i + 1) % 2 == 0)
+			angle = glfwGetTime() * 20.0f * i;
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
+	
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	// render your GUI
+	if (showGUI)
+	{
+		// setup GUI
+		ImGui::Begin("Camera Properties");
+		// camera pos, camera front?, cam up, zoom,
+		float position[3] = { cam.Position.x, cam.Position.y, cam.Position.z};
+		float front[3] = { cam.Front.x, cam.Front.y, cam.Front.z};
+		float up[3] = { cam.Up.x, cam.Up.y, cam.Up.z};
+		ImGui::InputFloat3("Position", position, 2);
+		ImGui::InputFloat3("Front", front, 2);
+		ImGui::InputFloat3("Up", up, 2);
+		ImGui::InputFloat("Zoom(FOV)", &cam.Zoom);
+		ImGui::End();
+	}
+	// render GUI
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	
+	glfwSwapBuffers(window);
 }
 
-// render your GUI
-if (showGUI)
+// render :: glfwMakeContextCurrent...glfwSwapBuffers
+void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 {
-	// setup GUI
-	ImGui::Begin("Noise Colors");
-	ImGui::ColorEdit3("Color 1", color1);
-	ImGui::ColorEdit3("Color 2", color2);
-	ImGui::ColorEdit3("Color 3", color3);
-	ImGui::End();
-}
-// render GUI
-ImGui::Render();
-ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	glfwMakeContextCurrent(window);
+	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(program);
 
-glfwSwapBuffers(window);
+	// common uniforms
+	int frameID = glGetUniformLocation(program, "frame");
+	int timeID = glGetUniformLocation(program, "time");
+	int resoID = glGetUniformLocation(program, "reso");
+	glUniform1i(frameID, frame);
+	glUniform1f(timeID, time);
+	glUniform2f(resoID, width, height);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+
+	// bind vao and render elements
+	glBindVertexArray(vao);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	// render your GUI
+	if (showGUI)
+	{
+		// setup GUI
+		ImGui::Begin("Raymarch Properties");
+		ImGui::Text("FPS: %.0f", 1.0f / delta);
+		ImGui::End();
+	}
+	// render GUI
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	glfwSwapBuffers(window);
 }
 
 // glfw: whenever the window size changes (by OS or user resize) this callback function executes
@@ -446,6 +498,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
 	{
 		type = CUBES;
+		// tell GLFW to capture our mouse
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+	{
+		type = RAYMARCH;
 		// tell GLFW to capture our mouse
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}

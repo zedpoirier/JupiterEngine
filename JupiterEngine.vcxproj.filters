@@ -57,6 +57,9 @@
     <None Include="res\shaders\dots.frag" />
     <None Include="res\shaders\laser.frag" />
     <None Include="res\shaders\noise.frag" />
+    <None Include="res\shaders\raymarching.frag" />
+    <None Include="res\shaders\fullscreen.vert" />
+    <None Include="res\shaders\raymarching.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h">
