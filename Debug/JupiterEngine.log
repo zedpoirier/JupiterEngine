@@ -1,26 +1,26 @@
 ﻿  Application.cpp
-C:\Dev\JupiterEngine\src\Application.cpp(284,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(286,32): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(288,33): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(290,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(292,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(294,27): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(296,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(325,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(326,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(326,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(374,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(375,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(375,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(388,34): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(430,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(431,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(431,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(465,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(466,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(470,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(471,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(473,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(474,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Dev\JupiterEngine\src\Application.cpp(482,25): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(289,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(291,32): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(293,33): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(295,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(297,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(299,27): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(301,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(330,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(331,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(331,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(379,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(380,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(380,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(393,34): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(435,22): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(436,29): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(436,22): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(470,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(471,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(475,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(476,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(478,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(479,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Dev\JupiterEngine\src\Application.cpp(487,25): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   JupiterEngine.vcxproj -> C:\Dev\JupiterEngine\Debug\JupiterEngine.exe

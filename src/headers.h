@@ -33,6 +33,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-std::string ParseShader(const std::string& filepath);
+std::string ParseShader(const std::string filepath);
+std::string ParseShader(const std::string filepaths[]);
 unsigned int CompileShader(unsigned int type, const char* shaderSource);
 unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader);

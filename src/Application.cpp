@@ -15,6 +15,8 @@
 	https://stackoverflow.com/questions/3191978/how-to-use-glut-opengl-to-render-to-a-file
 	http://netpbm.sourceforge.net/doc/ppm.html#:~:text=The%20PPM%20format%20is%20a%20lowest%20common%20denominator%20color%20image%20file%20format.&text=For%20example%2C%20%22PPM%20using%20the,also%20called%20%22portable%20pixmaps.%22
 	https://eklitzke.org/rendering-videos-from-opengl
+	
+	raymarching:
 	http://jamie-wong.com/2016/07/15/ray-marching-signed-distance-functions/#the-raymarching-algorithm
 	https://www.youtube.com/watch?v=Cfe5UQ-1L9Q&t=3233s
 */
@@ -174,8 +176,9 @@ int main()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	std::string test[] = { "res/shaders/noise.glsl", "res/shaders/noise.frag" };
 	std::string vsSource = ParseShader("res/shaders/fullscreen.vert");
-	std::string fsSource = ParseShader("res/shaders/noise.frag");
+	std::string fsSource = ParseShader(test);
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
 	unsigned int program = CreateShader(vs, fs);
@@ -510,21 +513,44 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 // cherno: parse shader code from a .shader file to a const char*
-static std::string ParseShader(const std::string& filepath)
+static std::string ParseShader(const std::string filepath)
 {
 	std::string line;
 	std::stringstream ss;
-	/*std::ifstream noise("res/shaders/noise.glsl");
-	while (getline(noise, line))
-	{
-		ss << line << "\n";
-	}*/
 	std::ifstream stream(filepath);
 	while (getline(stream, line))
 	{
 		ss << line << "\n";
 	}
 	std::string result = ss.str();
+	return result;
+}
+
+// cherno: parse shader code from a .shader file to a const char* customized to take in multiple shader sources
+static std::string ParseShader(const std::string filepaths[])
+{
+	int count = 2;
+	std::string line;
+	std::string result;
+	for (int i = 0; i < count; i++)
+	{
+		std::cout << "parsing shader file " << i + 1 << " of " << count << " files..." << std::endl;
+		int n = 0;
+		std::stringstream ss;
+		std::ifstream stream(filepaths[i]);
+		while (getline(stream, line))
+		{
+			if (i > 0 && n == 0)
+			{
+				n++;
+				continue;
+			}
+			ss << line << "\n";
+			n++;
+
+		}
+		result += ss.str();
+	}
 	return result;
 }
 
