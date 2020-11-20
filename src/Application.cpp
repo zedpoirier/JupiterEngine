@@ -176,9 +176,9 @@ int main()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	std::string test[] = { "res/shaders/noise.glsl", "res/shaders/noise.frag" };
 	std::string vsSource = ParseShader("res/shaders/fullscreen.vert");
-	std::string fsSource = ParseShader(test);
+	std::string fsSourcePaths[] = { "res/shaders/noise.glsl", "res/shaders/noise.frag" };
+	std::string fsSource = ParseShader(fsSourcePaths);
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
 	unsigned int program = CreateShader(vs, fs);
@@ -203,7 +203,8 @@ int main()
 
 	// setup for RAYMARCH render
 	std::string vsSource3 = ParseShader("res/shaders/raymarching.vert");
-	std::string fsSource3 = ParseShader("res/shaders/raymarching.frag");
+	std::string fsSourcePaths3[] = { "res/shaders/sdf.glsl", "res/shaders/raymarching.frag" };
+	std::string fsSource3 = ParseShader(fsSourcePaths3);
 	const char* vs3 = vsSource3.c_str();
 	const char* fs3 = fsSource3.c_str();
 	unsigned int program3 = CreateShader(vs3, fs3);
@@ -534,7 +535,7 @@ static std::string ParseShader(const std::string filepaths[])
 	std::string result;
 	for (int i = 0; i < count; i++)
 	{
-		std::cout << "parsing shader file " << i + 1 << " of " << count << " files..." << std::endl;
+		//std::cout << "parsing shader file " << i + 1 << " of " << count << " files..." << std::endl;
 		int n = 0;
 		std::stringstream ss;
 		std::ifstream stream(filepaths[i]);

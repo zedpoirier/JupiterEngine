@@ -151,6 +151,7 @@
     <None Include="res\shaders\raymarching.frag" />
     <None Include="res\shaders\raymarching.vert" />
     <None Include="res\shaders\sdf.frag" />
+    <None Include="res\shaders\sdf.glsl" />
     <None Include="res\shaders\shader.comp" />
     <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\shader.geom" />

@@ -61,6 +61,7 @@
     <None Include="res\shaders\fullscreen.vert" />
     <None Include="res\shaders\raymarching.vert" />
     <None Include="res\shaders\noise.glsl" />
+    <None Include="res\shaders\sdf.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h">
