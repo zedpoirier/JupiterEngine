@@ -22,7 +22,7 @@
 */
 
 // settings
-DemoType type = RAYMARCH;
+DemoType type = FULLSCREEN;
 bool showGUI = false;
 double time = 0.0;
 double delta = 0.0;
@@ -38,7 +38,7 @@ glm::mat4 model;
 glm::mat4 projection;
 
 // camera
-Camera cam = Camera(glm::vec3(0.0f, 1.0f, 5.0f));
+Camera cam = Camera(glm::vec3(0.0f, 0.0f, 6.0f));
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
 bool firstMouse = true;
@@ -438,6 +438,13 @@ void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
+	// camera uniforms
+	int camPosID = glGetUniformLocation(program, "camPos");
+	int camFrontID = glGetUniformLocation(program, "camFront");
+	glUniform3f(camPosID, cam.Position.x, cam.Position.y, cam.Position.z);
+	glUniform3f(camFrontID, cam.Front.x, cam.Front.y, cam.Front.z);
+
+
 	// bind vao and render elements
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -448,6 +455,10 @@ void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 		// setup GUI
 		ImGui::Begin("Raymarch Properties");
 		ImGui::Text("FPS: %.0f", 1.0f / delta);
+		float position[3] = { cam.Position.x, cam.Position.y, cam.Position.z };
+		float front[3] = { cam.Front.x, cam.Front.y, cam.Front.z };
+		ImGui::InputFloat3("Position", position, 2);
+		ImGui::InputFloat3("Front", front, 2);
 		ImGui::End();
 	}
 	// render GUI
