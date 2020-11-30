@@ -62,6 +62,8 @@
     <None Include="res\shaders\raymarching.vert" />
     <None Include="res\shaders\noise.glsl" />
     <None Include="res\shaders\sdf.glsl" />
+    <None Include="res\shaders\shields.frag" />
+    <None Include="res\shaders\paddle.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h">

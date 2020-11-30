@@ -1,7 +1,7 @@
 #include <headers.h>
 
 /*
-	things worth trying to emulate:
+	things worth trying:
 
 	compute:
 	https://twitter.com/totallyRonja/status/1287421347749076992
@@ -22,7 +22,7 @@
 */
 
 // settings
-DemoType type = FULLSCREEN;
+DemoType type = PADDLE;
 bool showGUI = false;
 double time = 0.0;
 double delta = 0.0;
@@ -31,6 +31,10 @@ double mousePosY = 0;
 unsigned int frame = 0;
 unsigned int width = 800;
 unsigned int height = 600;
+float xRot = 0.0;
+float zRot = 0.0;
+float rotSpeed = 2.0;
+float PI = 3.1415;
 
 // matrices
 glm::mat4 view;
@@ -38,7 +42,7 @@ glm::mat4 model;
 glm::mat4 projection;
 
 // camera
-Camera cam = Camera(glm::vec3(0.0f, 0.0f, 6.0f));
+Camera cam = Camera(glm::vec3(0.0f, 0.0f, 10.0f));
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
 bool firstMouse = true;
@@ -166,18 +170,18 @@ int main()
 	glGenBuffers(1, &vboFullQuad);
 	glBindBuffer(GL_ARRAY_BUFFER, vboFullQuad);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
-	unsigned int eboFullQuad;
-	glGenBuffers(1, &eboFullQuad);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	unsigned int eboFullQuad;
+	glGenBuffers(1, &eboFullQuad);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 	std::string vsSource = ParseShader("res/shaders/fullscreen.vert");
-	std::string fsSourcePaths[] = { "res/shaders/noise.glsl", "res/shaders/noise.frag" };
+	std::vector<std::string> fsSourcePaths = { "res/shaders/noise.glsl", "res/shaders/noise.frag" };
 	std::string fsSource = ParseShader(fsSourcePaths);
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
@@ -203,11 +207,19 @@ int main()
 
 	// setup for RAYMARCH render
 	std::string vsSource3 = ParseShader("res/shaders/raymarching.vert");
-	std::string fsSourcePaths3[] = { "res/shaders/sdf.glsl", "res/shaders/raymarching.frag" };
+	std::vector<std::string> fsSourcePaths3 = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/raymarching.frag" };
 	std::string fsSource3 = ParseShader(fsSourcePaths3);
 	const char* vs3 = vsSource3.c_str();
 	const char* fs3 = fsSource3.c_str();
 	unsigned int program3 = CreateShader(vs3, fs3);
+
+	// setup for PADDLE render
+	std::string vsSource4 = ParseShader("res/shaders/raymarching.vert");
+	std::vector<std::string> fsSourcePaths4 = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/paddle.frag" };
+	std::string fsSource4 = ParseShader(fsSourcePaths4);
+	const char* vs4 = vsSource4.c_str();
+	const char* fs4 = fsSource4.c_str();
+	unsigned int program4 = CreateShader(vs4, fs4);
 
 
 	// main Loop
@@ -231,6 +243,9 @@ int main()
 			break;
 		case RAYMARCH:
 			renderRAYMARCH(window, program3, vaoFullQuad);
+			break;
+		case PADDLE:
+			renderRAYMARCH(window, program4, vaoFullQuad);
 			break;
 		}
 	}
@@ -300,6 +315,18 @@ void process(GLFWwindow * window)
 		cam.ProcessKeyboard(UP, delta);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		cam.ProcessKeyboard(DOWN, delta);
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		zRot += delta * rotSpeed;
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		zRot -= delta * rotSpeed;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		xRot += delta * rotSpeed;
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		xRot -= delta * rotSpeed;
+
+	xRot = std::clamp(xRot, -3.1415f / 3.0f, 3.1415f / 3.0f);
+	zRot = std::clamp(zRot, -3.1415f / 3.0f, 3.1415f / 3.0f);
 
 	glfwPollEvents();
 }
@@ -444,6 +471,9 @@ void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 	glUniform3f(camPosID, cam.Position.x, cam.Position.y, cam.Position.z);
 	glUniform3f(camFrontID, cam.Front.x, cam.Front.y, cam.Front.z);
 
+	// paddle uniforms
+	int rotID = glGetUniformLocation(program, "paddleRot");
+	glUniform3f(rotID, xRot, 0.0, zRot);
 
 	// bind vao and render elements
 	glBindVertexArray(vao);
@@ -522,6 +552,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		// tell GLFW to capture our mouse
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
+	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+	{
+		type = PADDLE;
+		// tell GLFW to capture our mouse
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 }
 
 // cherno: parse shader code from a .shader file to a const char*
@@ -539,9 +575,9 @@ static std::string ParseShader(const std::string filepath)
 }
 
 // cherno: parse shader code from a .shader file to a const char* customized to take in multiple shader sources
-static std::string ParseShader(const std::string filepaths[])
+static std::string ParseShader(const std::vector<std::string> filepaths)
 {
-	int count = 2;
+	int count = filepaths.size();
 	std::string line;
 	std::string result;
 	for (int i = 0; i < count; i++)

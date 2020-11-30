@@ -77,12 +77,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)dependencies;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\glfw\lib-vc2019</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Src\vcpkg\installed\x86-windows\debug\lib\imguid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -148,6 +149,7 @@
     <None Include="res\shaders\laser.frag" />
     <None Include="res\shaders\noise.frag" />
     <None Include="res\shaders\noise.glsl" />
+    <None Include="res\shaders\paddle.frag" />
     <None Include="res\shaders\raymarching.frag" />
     <None Include="res\shaders\raymarching.vert" />
     <None Include="res\shaders\sdf.frag" />
@@ -157,6 +159,7 @@
     <None Include="res\shaders\shader.geom" />
     <None Include="res\shaders\shader.tese" />
     <None Include="res\shaders\shader.vert" />
+    <None Include="res\shaders\shields.frag" />
     <None Include="res\shaders\shot.frag" />
     <None Include="res\shaders\shot.vert" />
   </ItemGroup>

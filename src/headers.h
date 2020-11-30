@@ -1,25 +1,31 @@
 #pragma once
-#include <glad/include/glad/glad.h>
-#include <glfw/include/GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+//#include <imgui.h>
+//#include <imgui_impl_opengl3.h>
+//#include <imgui_impl_glfw.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_impl_glfw.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <Camera.h>
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <vector>
 
 enum DemoType {
 	FULLSCREEN,
 	CUBES,
-	RAYMARCH
+	RAYMARCH,
+	PADDLE
 };
 
 
@@ -34,6 +40,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 std::string ParseShader(const std::string filepath);
-std::string ParseShader(const std::string filepaths[]);
+std::string ParseShader(const std::vector<std::string> filepaths);
 unsigned int CompileShader(unsigned int type, const char* shaderSource);
 unsigned int CreateShader(const char*& vertexShader, const char*& fragmentShader);
