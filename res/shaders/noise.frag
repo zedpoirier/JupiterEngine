@@ -17,7 +17,7 @@ uniform vec3 col3;
 
 void main()
 {
-    vec2 p = (gl_FragCoord.xy - 0.5 * reso.xy) / reso.y;
+    vec2 p = texcoord - 0.5;
 
 	//float spin = frame * 0.08 * length(p);
 	float spin = sin( (frame - (200.5*length(p))) * 0.02);

@@ -6,8 +6,9 @@ out vec4 FragColor;
 
 uniform sampler2D texture0;
 uniform sampler2D texture1;
-uniform vec4 time;
-uniform vec4 reso;
+uniform float time;
+uniform int frame;
+uniform vec2 reso;
 
 float box(vec2 st, vec2 size)
 {
@@ -20,7 +21,7 @@ float box(vec2 st, vec2 size)
 void main()
 {
 	vec2 uv = texcoord;
-	vec2 p = vec2(uv.x, uv.y - time.x);
+	vec2 p = vec2(uv.x, uv.y - frame / 60.0);
 	vec4 color = vec4(box(fract(p), vec2(0.05, 0.2)));
 	vec2 offset1 = vec2(0.2, 0.4);
 	color += vec4(box(fract(p + offset1), vec2(0.05, 0.2)));

@@ -23,11 +23,23 @@ float difference(float distA, float distB)
 // 2D SDFs
 //----------------------------------------------------
 
-// TODO
+float line( vec2 p, float r, vec2 a = vec2(0.0, 0.0), vec2 b = vec2(0.0, 1.0))
+{
+  vec2 pa = p - a, ba = b - a;
+  float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+  return length( pa - ba*h ) - r;
+}
 
 //----------------------------------------------------
 // 3D SDFs
 //----------------------------------------------------
+
+float line( vec3 p, float r, vec3 a = vec3(0.0, 0.0, 0.0), vec3 b = vec3(0.0, 1.0, 0.0))
+{
+  vec3 pa = p - a, ba = b - a;
+  float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+  return length( pa - ba*h ) - r;
+}
 
 float sphere( vec3 p, float s )
 {

@@ -64,6 +64,8 @@
     <None Include="res\shaders\sdf.glsl" />
     <None Include="res\shaders\shields.frag" />
     <None Include="res\shaders\paddle.frag" />
+    <None Include="res\shaders\particles.frag" />
+    <None Include="res\shaders\fullscreenTransform.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers.h">

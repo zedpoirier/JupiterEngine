@@ -22,15 +22,15 @@
 */
 
 // settings
-DemoType type = PADDLE;
+DemoType type = FULLSCREEN;
 bool showGUI = false;
-double time = 0.0;
+float time = 0.0;
 double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 800;
-unsigned int height = 600;
+unsigned int width = 980;
+unsigned int height = 540;
 float xRot = 0.0;
 float zRot = 0.0;
 float rotSpeed = 2.0;
@@ -152,16 +152,6 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 330");
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-
 	// setup for FULLSCREEN render
 	unsigned int vaoFullQuad;
 	glGenVertexArrays(1, &vaoFullQuad);
@@ -181,7 +171,7 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 	std::string vsSource = ParseShader("res/shaders/fullscreen.vert");
-	std::vector<std::string> fsSourcePaths = { "res/shaders/noise.glsl", "res/shaders/noise.frag" };
+	std::vector<std::string> fsSourcePaths = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/noise.frag" };
 	std::string fsSource = ParseShader(fsSourcePaths);
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
@@ -221,6 +211,14 @@ int main()
 	const char* fs4 = fsSource4.c_str();
 	unsigned int program4 = CreateShader(vs4, fs4);
 
+	// setup for PARTICLES render
+	std::string vsSource5 = ParseShader("res/shaders/shader.vert");
+	std::vector<std::string> fsSourcePaths5 = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/particles.frag" };
+	std::string fsSource5 = ParseShader(fsSourcePaths5);
+	const char* vs5 = vsSource5.c_str();
+	const char* fs5 = fsSource5.c_str();
+	unsigned int program5 = CreateShader(vs5, fs5);
+
 
 	// main Loop
 	while (!glfwWindowShouldClose(window))
@@ -246,6 +244,9 @@ int main()
 			break;
 		case PADDLE:
 			renderRAYMARCH(window, program4, vaoFullQuad);
+			break;
+		case PARTICLES:
+			renderPARTICLES(window, program5, vaoFullQuad);
 			break;
 		}
 	}
@@ -274,6 +275,17 @@ GLFWwindow* initialize()
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	// Setup Platform/Renderer bindings
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
 
 	glfwSetKeyCallback(window, key_callback);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -359,6 +371,24 @@ void renderFULLSCREEN(GLFWwindow* window, unsigned int program, unsigned int vao
 	glUniform2f(resoID, width, height);
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+
+	// shader matrix uniforms
+	view = cam.GetViewMatrix();
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0, 0.0, 5.0));
+	projection = glm::perspective(glm::radians(cam.Zoom), (float)(width / height), 0.1f, 100.0f);
+	int viewID = glGetUniformLocation(program, "view");
+	int modelID = glGetUniformLocation(program, "model");
+	int projID = glGetUniformLocation(program, "projection");
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
+
+	// camera uniforms
+	int camPosID = glGetUniformLocation(program, "camPos");
+	int camFrontID = glGetUniformLocation(program, "camFront");
+	glUniform3f(camPosID, cam.Position.x, cam.Position.y, cam.Position.z);
+	glUniform3f(camFrontID, cam.Front.x, cam.Front.y, cam.Front.z);
 	
 	// bind vao and render elements
 	glBindVertexArray(vao);
@@ -498,6 +528,71 @@ void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 	glfwSwapBuffers(window);
 }
 
+// render :: glfwMakeContextCurrent...glfwSwapBuffers
+void renderPARTICLES(GLFWwindow* window, unsigned int program, unsigned int vao)
+{
+	glfwMakeContextCurrent(window);
+	glClearColor(0.1f, 0.1f, 0.3f, 0.9f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(program);
+
+	// shader matrix uniforms
+	view = cam.GetViewMatrix();
+	projection = glm::perspective(glm::radians(cam.Zoom), (float)(width / height), 0.1f, 100.0f);
+	int viewID = glGetUniformLocation(program, "view");
+	int modelID = glGetUniformLocation(program, "model");
+	int projID = glGetUniformLocation(program, "projection");
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projID, 1, GL_FALSE, glm::value_ptr(projection));
+
+	// common uniforms
+	int frameID = glGetUniformLocation(program, "frame");
+	int timeID = glGetUniformLocation(program, "time");
+	int resoID = glGetUniformLocation(program, "reso");
+	glUniform1i(frameID, frame);
+	glUniform1f(timeID, time);
+	glUniform2f(resoID, width, height);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+
+
+	glBindVertexArray(vao);
+	for (unsigned int i = 0; i < 15; i++)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::vec3 pos = glm::vec3(sin(i), cos(i), i - 2.0f);
+		model = glm::translate(model, pos * 0.5f);
+		model = glm::rotate(model, glm::radians(20.0f * (i+1)), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(3.0, 3.0, 1.0));
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(model));
+
+		// bind vao and render elements
+		glBindVertexArray(vao);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
+
+	// render your GUI
+	if (showGUI)
+	{
+		// setup GUI
+		ImGui::Begin("Camera Properties");
+		// camera pos, camera front?, cam up, zoom,
+		float position[3] = { cam.Position.x, cam.Position.y, cam.Position.z };
+		float front[3] = { cam.Front.x, cam.Front.y, cam.Front.z };
+		float up[3] = { cam.Up.x, cam.Up.y, cam.Up.z };
+		ImGui::InputFloat3("Position", position, 2);
+		ImGui::InputFloat3("Front", front, 2);
+		ImGui::InputFloat3("Up", up, 2);
+		ImGui::InputFloat("Zoom(FOV)", &cam.Zoom);
+		ImGui::End();
+	}
+	// render GUI
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	glfwSwapBuffers(window);
+}
+
 // glfw: whenever the window size changes (by OS or user resize) this callback function executes
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -555,6 +650,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
 	{
 		type = PADDLE;
+		// tell GLFW to capture our mouse
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS)
+	{
+		type = PARTICLES;
 		// tell GLFW to capture our mouse
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}

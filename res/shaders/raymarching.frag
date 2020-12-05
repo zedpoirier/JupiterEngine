@@ -17,6 +17,7 @@ uniform vec3 camFront;
 #define MAX_STEPS 100
 #define MAX_DIST 1000.0
 #define SURFACE_DIST 0.001
+#define PI 3.14159
 
 float Scene(vec3 p)
 {
@@ -27,6 +28,16 @@ float Scene(vec3 p)
 	vec3 s = p;
 	s.z *= 0.5;
 	geo = difference(geo, sphere(s - vec3(0.0, 0.0, sin(time) * 0.5), 0.6) - 0.2 * fractalNoise(p, 3));
+
+	// lines and angles
+	float angle = PI * 2.0 / 12.0;
+	float sector = round(atan(p.z,p.x)/angle);
+	vec3 l = p;
+	float an = sector*angle;
+	l.xz = mat2(cos(an), -sin(an), sin(an), cos(an)) * l.xz; // order of operation matters here!!!!
+	l.y -= -0.5;
+	geo = combine(geo, line(l - vec3(12.0, 0.0, 0.0), 0.2));
+
 
 	vec3 c = p;
 	float ct = frame * 8.0;

@@ -146,10 +146,12 @@
     <None Include="res\shaders\dots.frag" />
     <None Include="res\shaders\FS.shader" />
     <None Include="res\shaders\fullscreen.vert" />
+    <None Include="res\shaders\fullscreenTransform.vert" />
     <None Include="res\shaders\laser.frag" />
     <None Include="res\shaders\noise.frag" />
     <None Include="res\shaders\noise.glsl" />
     <None Include="res\shaders\paddle.frag" />
+    <None Include="res\shaders\particles.frag" />
     <None Include="res\shaders\raymarching.frag" />
     <None Include="res\shaders\raymarching.vert" />
     <None Include="res\shaders\sdf.frag" />
