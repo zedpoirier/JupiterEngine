@@ -14,6 +14,8 @@ uniform vec3 camPos;
 uniform vec3 camFront;
 
 uniform vec3 paddleRot;
+uniform vec3 controllerPos;
+uniform mat3x4 paddle;
 
 // raymarching sometimes called spghere tracing
 #define MAX_STEPS 100
@@ -49,7 +51,7 @@ float Scene(vec3 p)
 	pa.y -= 4.0 * clamp(easeOutBounce(frame / 60.0 / bounceTime), 0.0, 1.0);
 	geo = combine(geo, sphere(pa , 0.5));
 
-	// paddle
+	// paddle with keys...
 	float x = paddleRot.x;
 	float z = paddleRot.z;
 	vec3 pad = -p;
@@ -60,6 +62,20 @@ float Scene(vec3 p)
 	geo = combine(geo, cylinder(pad, 2.0, 0.05));
 	pad.yz *= mat2(cos(an), -sin(an), sin(an), cos(an));
 	geo = combine(geo, hexagon(pad, vec2(1.5, 0.1)));
+
+	// paddle with VR
+	vec3 vr = p;
+	vr.xz = mat2(cos(PI), -sin(PI), sin(PI), cos(PI)) * vr.xz;
+	vr = (paddle * vr).xyz;
+	vr.z += 2.0;
+	vr += vec3(controllerPos.x, -controllerPos.y, controllerPos.z);
+	geo = combine(geo, cylinder(vr, 2.0, 0.05));
+	geo = combine(geo, cylinder(vr, 1.8, 0.1));
+	geo = combine(geo, sphere(vr - vec3(0.0, 0.0, 1.0), 0.3));
+	vec3 rot = vr;
+	rot.z -= 2.0;
+	rot.yz = mat2(cos(an), -sin(an), sin(an), cos(an)) * rot.yz;
+	geo = combine(geo, cylinder(rot, 0.3, 1.0));
 
 
 	return geo;
@@ -143,7 +159,10 @@ void main()
 	vec3 rt1 = vec3(0.0, -1.0, 0.0);
 	float perc = clamp(easeOutBounce(frame / 60.0 / bounceTime), 0.0, 1.0);
 	vec3 ro = mix(ro0, ro1, perc);
+	ro = vec3(0.0, 4.0, 10.0);
 	vec3 rt = mix(rt0, rt1, perc);
+	rt = vec3(controllerPos.x, -controllerPos.y, controllerPos.z);
+	rt = vec3(0.0, 0.0, 0.0);
 	vec3 rd = normalize(vec3(uv.x, uv.y, -1.0));
 	rd = (viewMatrix(ro, rt) * vec4(rd, 0.0)).xyz;
 

@@ -51,6 +51,7 @@ float xRot = 0.0;
 float zRot = 0.0;
 float rotSpeed = 2.0;
 float PI = 3.1415;
+glm::vec3 controllerPos = glm::vec3(0.0f);
 
 // matrices
 glm::mat4 view;
@@ -525,8 +526,17 @@ void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 	glUniform3f(camFrontID, cam.Front.x, cam.Front.y, cam.Front.z);
 
 	// paddle uniforms
+	float p[3] = { // 3 is hardcoded for the first (only) controller
+				tracked_device_pose[4].mDeviceToAbsoluteTracking.m[0][3],
+				tracked_device_pose[4].mDeviceToAbsoluteTracking.m[1][3],
+				tracked_device_pose[4].mDeviceToAbsoluteTracking.m[2][3]
+	};
+	int controllerID = glGetUniformLocation(program, "controllerPos");
 	int rotID = glGetUniformLocation(program, "paddleRot");
+	int paddleID = glGetUniformLocation(program, "paddle");
+	glUniform3f(controllerID, p[0], p[1], p[2]);
 	glUniform3f(rotID, xRot, 0.0, zRot);
+	glUniformMatrix3x4fv(paddleID, 1, 0, &tracked_device_pose[4].mDeviceToAbsoluteTracking.m[0][0]);
 
 	// bind vao and render elements
 	glBindVertexArray(vao);
@@ -542,6 +552,7 @@ void renderRAYMARCH(GLFWwindow* window, unsigned int program, unsigned int vao)
 		float front[3] = { cam.Front.x, cam.Front.y, cam.Front.z };
 		ImGui::InputFloat3("Position", position, 2);
 		ImGui::InputFloat3("Front", front, 2);
+		ImGui::InputFloat3("Controller", p, 2);
 		ImGui::End();
 	}
 	// render GUI
@@ -853,7 +864,7 @@ void processVR()
 	// Obtain tracking device poses
 	vr_context->GetDeviceToAbsoluteTrackingPose(vr::ETrackingUniverseOrigin::TrackingUniverseStanding, 0, tracked_device_pose, vr::k_unMaxTrackedDeviceCount);
 
-	ImGui::Begin("VR Device Positions and Velocities");
+	//ImGui::Begin("VR Device Positions and Velocities");
 	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; nDevice++)
 	{
 		if ((tracked_device_pose[nDevice].bDeviceIsConnected) && (tracked_device_pose[nDevice].bPoseIsValid))
@@ -874,13 +885,13 @@ void processVR()
 			if (tracked_device_type[nDevice] == "HMD" || tracked_device_type[nDevice] == "Controller")
 			{
 				const char* type = tracked_device_type[nDevice].c_str();
-				ImGui::Text(type);
-				ImGui::DragFloat3("Position", p);
-				ImGui::DragFloat3("Velocity", tracked_device_pose[nDevice].vVelocity.v);
+				//ImGui::Text(type);
+				//ImGui::DragFloat3("Position", p);
+				//ImGui::DragFloat3("Velocity", tracked_device_pose[nDevice].vVelocity.v);
 			}
 		}
 	}
-	ImGui::End();
+	//ImGui::End();
 }
 
 // name helper
