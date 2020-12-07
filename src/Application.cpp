@@ -1,4 +1,5 @@
 #include <headers.h>
+using namespace std;
 
 /*
 	things worth trying:
@@ -20,6 +21,21 @@
 	http://jamie-wong.com/2016/07/15/ray-marching-signed-distance-functions/#the-raymarching-algorithm
 	https://www.youtube.com/watch?v=Cfe5UQ-1L9Q&t=3233s
 */
+
+// ----------------
+// OpenVR variables 
+// ----------------
+
+vr::IVRSystem* vr_context;
+vr::TrackedDevicePose_t tracked_device_pose[vr::k_unMaxTrackedDeviceCount];
+
+// ----------------
+// app variables
+// ----------------
+
+bool app_end = false;
+string driver_name, driver_serial;
+string tracked_device_type[vr::k_unMaxTrackedDeviceCount];
 
 // settings
 DemoType type = FULLSCREEN;
@@ -126,6 +142,9 @@ int main()
 	if (window == NULL) return -1; // Failed to initialize
 	std::cout << "Jupiter is rising bitches..." << std::endl;
 
+	// VR testing
+	if (init_OpenVR() != 0) return -1;
+
 	// stb: load images
 	stbi_set_flip_vertically_on_load(true);
 	int imgWidth, imgHeight, imgNumChannels;
@@ -230,6 +249,9 @@ int main()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
+		// vr stuff
+		if (vr_context != NULL) processVR();
+
 		// render geometry and gui based on DemoType
 		switch (type)
 		{
@@ -251,6 +273,7 @@ int main()
 		}
 	}
 	glfwTerminate();
+	vr::VR_Shutdown();
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
@@ -748,4 +771,196 @@ static unsigned int CreateShader(const char*& vertexShader, const char*& fragmen
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 	return program;
+}
+
+// matias: vr init functions and error checking
+int init_OpenVR()
+{
+	// Check whether there is an HMD plugged-in and the SteamVR runtime is installed
+	if (vr::VR_IsHmdPresent() && vr::VR_IsRuntimeInstalled())
+	{
+		cout << "An HMD was successfully found in the system" << endl;
+	}
+	else
+	{
+		cout << "No HMD was found or runtime incorrectly installed in the system, quitting app" << endl;
+		return -1;
+	}
+
+	// Load the SteamVR Runtime
+	vr::HmdError err;
+	vr_context = vr::VR_Init(&err, vr::EVRApplicationType::VRApplication_Scene);
+	vr_context == NULL ? 
+		cout << "Error while initializing SteamVR runtime. Error code is " << vr::VR_GetVRInitErrorAsSymbol(err) << endl 
+		: cout << "SteamVR runtime successfully initialized" << endl;
+
+	// Obtain some basic information given by the runtime
+	int controller_count = 0;
+	int base_stations_count = 0;
+	for (uint32_t td = vr::k_unTrackedDeviceIndex_Hmd; td < vr::k_unMaxTrackedDeviceCount; td++) {
+
+		if (vr_context->IsTrackedDeviceConnected(td))
+		{
+			cout << "Tracking device " << td << " is connected " << endl;
+			int td_class = vr_context->GetTrackedDeviceClass(td);
+			switch (td_class)
+			{
+			case vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid:
+				cout << "  Device type: Invalid" << endl;	
+				tracked_device_type[td] = "Invalid";
+				break;
+			case vr::ETrackedDeviceClass::TrackedDeviceClass_HMD:
+				cout << "  Device type: HMD" << endl;
+				tracked_device_type[td] = "HMD";
+				break;
+			case vr::ETrackedDeviceClass::TrackedDeviceClass_Controller:
+				cout << "  Device type: Controller" << endl;
+				tracked_device_type[td] = "Controller";
+				controller_count++;
+				cout << "    Controller Count: " << controller_count << endl;
+				break;
+			case vr::ETrackedDeviceClass::TrackedDeviceClass_GenericTracker:
+				cout << "  Device type: Generic Tracker" << endl;
+				tracked_device_type[td] = "Generic Tracker";
+				break;
+			case vr::ETrackedDeviceClass::TrackedDeviceClass_TrackingReference:
+				cout << "  Device type: Base Station" << endl;
+				tracked_device_type[td] = "Base Station";
+				base_stations_count++;
+				cout << "    Base Station Count: " << base_stations_count << endl;
+				break;
+			case vr::ETrackedDeviceClass::TrackedDeviceClass_DisplayRedirect:
+				cout << "  Device type: Display Redirect" << endl;
+				tracked_device_type[td] = "Display Redirect";
+				break;
+			default:
+				break;
+			}
+			
+		}
+	}
+
+	return 0;
+}
+
+// openVR: process vr stuff???
+void processVR()
+{
+	vr::VREvent_t event;
+	while (vr_context->PollNextEvent(&event, sizeof(event)))
+		process_vr_event(event);
+
+	// Obtain tracking device poses
+	vr_context->GetDeviceToAbsoluteTrackingPose(vr::ETrackingUniverseOrigin::TrackingUniverseStanding, 0, tracked_device_pose, vr::k_unMaxTrackedDeviceCount);
+
+	ImGui::Begin("VR Device Positions and Velocities");
+	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; nDevice++)
+	{
+		if ((tracked_device_pose[nDevice].bDeviceIsConnected) && (tracked_device_pose[nDevice].bPoseIsValid))
+		{
+
+			// Check whether the tracked device is a controller.
+			vr::VRControllerState_t controller_state;
+			if (vr_context->GetControllerState(nDevice, &controller_state, sizeof(controller_state)))
+				((vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Axis1) & controller_state.ulButtonPressed) == 0) ? showGUI = true : showGUI = false;
+
+			// We take just the translation part of the matrix (actual position of tracked device, not orientation)
+			float p[3] = { 
+				tracked_device_pose[nDevice].mDeviceToAbsoluteTracking.m[0][3], 
+				tracked_device_pose[nDevice].mDeviceToAbsoluteTracking.m[1][3], 
+				tracked_device_pose[nDevice].mDeviceToAbsoluteTracking.m[2][3] 
+			};
+
+			if (tracked_device_type[nDevice] == "HMD" || tracked_device_type[nDevice] == "Controller")
+			{
+				const char* type = tracked_device_type[nDevice].c_str();
+				ImGui::Text(type);
+				ImGui::DragFloat3("Position", p);
+				ImGui::DragFloat3("Velocity", tracked_device_pose[nDevice].vVelocity.v);
+			}
+		}
+	}
+	ImGui::End();
+}
+
+// name helper
+string GetTrackedDeviceClassName(int td_class)
+{
+	string name = "";
+	switch (td_class)
+	{
+	case vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid:
+		name = " Invalid";
+		break;
+	case vr::ETrackedDeviceClass::TrackedDeviceClass_HMD:
+		name = "HMD";
+		break;
+	case vr::ETrackedDeviceClass::TrackedDeviceClass_Controller:
+		name = "Controller";
+		break;
+	case vr::ETrackedDeviceClass::TrackedDeviceClass_GenericTracker:
+		name = "Generic Tracker";
+		break;
+	case vr::ETrackedDeviceClass::TrackedDeviceClass_TrackingReference:
+		name = "Base Station";
+		break;
+	case vr::ETrackedDeviceClass::TrackedDeviceClass_DisplayRedirect:
+		name = "Display Redirect";
+		break;
+	default:
+		break;
+	}
+
+	return name;
+}
+
+void process_vr_event(const vr::VREvent_t& event)
+{
+	int td_class = vr_context->GetTrackedDeviceClass(event.trackedDeviceIndex);
+	string str_td_class = GetTrackedDeviceClassName(td_class);
+
+	switch (event.eventType)
+	{
+	case vr::VREvent_TrackedDeviceActivated:
+	{
+		cout << "Device " << event.trackedDeviceIndex << " attached (" << str_td_class << ")" << endl;
+		tracked_device_type[event.trackedDeviceIndex] = str_td_class;
+	}
+	break;
+	case vr::VREvent_TrackedDeviceDeactivated:
+	{
+		cout << "Device " << event.trackedDeviceIndex << " detached (" << str_td_class << ")" << endl;
+		tracked_device_type[event.trackedDeviceIndex] = "";
+	}
+	break;
+	case vr::VREvent_TrackedDeviceUpdated:
+	{
+		cout << "Device " << event.trackedDeviceIndex << " updated (" << str_td_class << ")" << endl;
+	}
+	break;
+	case vr::VREvent_ButtonPress:
+	{
+		vr::VREvent_Controller_t controller_data = event.data.controller;
+		cout << "Pressed button " << vr_context->GetButtonIdNameFromEnum((vr::EVRButtonId) controller_data.button) << " of device " << event.trackedDeviceIndex << " (" << str_td_class << ")" << endl;
+	}
+	break;
+	case vr::VREvent_ButtonUnpress:
+	{
+		vr::VREvent_Controller_t controller_data = event.data.controller;
+		cout << "Unpressed button " << vr_context->GetButtonIdNameFromEnum((vr::EVRButtonId) controller_data.button) << " of device " << event.trackedDeviceIndex << " (" << str_td_class << ")" << endl;
+	}
+	break;
+	case vr::VREvent_ButtonTouch:
+	{
+		vr::VREvent_Controller_t controller_data = event.data.controller;
+		cout << "Touched button " << vr_context->GetButtonIdNameFromEnum((vr::EVRButtonId) controller_data.button) << " of device " << event.trackedDeviceIndex << " (" << str_td_class << ")" << endl;
+	}
+	break;
+	case vr::VREvent_ButtonUntouch:
+	{
+		vr::VREvent_Controller_t controller_data = event.data.controller;
+		cout << "Untouched button " << vr_context->GetButtonIdNameFromEnum((vr::EVRButtonId) controller_data.button) << " of device " << event.trackedDeviceIndex << " (" << str_td_class << ")" << endl;
+	}
+	break;
+	}
 }

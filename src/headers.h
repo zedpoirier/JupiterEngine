@@ -13,6 +13,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <Camera.h>
+#include <openvr.h>
+#include <openvr_capi.h>
 
 #include <algorithm>
 #include <iostream>
@@ -31,6 +33,9 @@ enum DemoType {
 
 
 // prototype functions
+int init_OpenVR();
+void processVR();
+void process_vr_event(const vr::VREvent_t& event);
 GLFWwindow* initialize();
 void process(GLFWwindow * window);
 void renderFULLSCREEN(GLFWwindow* window, unsigned int program, unsigned int vao);
