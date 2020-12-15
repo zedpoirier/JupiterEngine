@@ -23,7 +23,9 @@
 
 // settings
 DemoType type = FULLSCREEN;
+bool captureFrame = false;
 bool showGUI = false;
+bool paused = false;
 float time = 0.0;
 double delta = 0.0;
 double mousePosX = 0;
@@ -300,9 +302,12 @@ GLFWwindow* initialize()
 // process :: glfwPollEvents
 void process(GLFWwindow * window)
 {
-	frame++;
-	delta = glfwGetTime() - time;
-	time = glfwGetTime();
+	if (!paused)
+	{
+		frame++;
+		delta = glfwGetTime() - time;
+		time = glfwGetTime();
+	}
 	glfwGetCursorPos(window, &mousePosX, &mousePosY);
 	//std::cout << "FPS: " << 1.0f / delta << std::endl;
 	//std::cout << "Delta Time: " << delta << std::endl;
@@ -627,6 +632,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		showGUI = !showGUI;
+	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+		captureFrame = true;
+	if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS)
+		paused = !paused;
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+		frame += 1;
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+		frame -= 1;
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 	{
 		type = FULLSCREEN;

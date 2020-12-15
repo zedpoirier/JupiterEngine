@@ -23,7 +23,7 @@ void main()
 	float spin = sin( (frame - (200.5*length(p))) * 0.02);
 	p *= mat2(cos(spin), -sin(spin),
 			  sin(spin), cos(spin));
-	vec3 q = vec3(p.x, p.y, time * 0.04);
+	vec3 q = vec3(p.x, p.y, frame * 0.004);
 	vec3 n = vec3(fractalNoise(q, 5));
 
 	vec3 w1 = vec3(fractalNoise(q + vec3(0.0, 0.0, 0.0), 3),
