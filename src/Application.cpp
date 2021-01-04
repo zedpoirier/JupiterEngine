@@ -31,12 +31,13 @@ double delta = 0.0;
 double mousePosX = 0;
 double mousePosY = 0;
 unsigned int frame = 0;
-unsigned int width = 980;
+unsigned int width = 540;
 unsigned int height = 540;
 float xRot = 0.0;
 float zRot = 0.0;
 float rotSpeed = 2.0;
 float PI = 3.1415;
+float* pixels = (float*)(width * height);
 glm::vec3 controllerPos = glm::vec3(0.0f);
 
 // matrices
@@ -174,7 +175,7 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboFullQuad);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 	std::string vsSource = ParseShader("res/shaders/fullscreen.vert");
-	std::vector<std::string> fsSourcePaths = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/noise.frag" };
+	std::vector<std::string> fsSourcePaths = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/ftl.frag" };
 	std::string fsSource = ParseShader(fsSourcePaths);
 	const char* vs = vsSource.c_str();
 	const char* fs = fsSource.c_str();
@@ -208,7 +209,7 @@ int main()
 
 	// setup for PADDLE render
 	std::string vsSource4 = ParseShader("res/shaders/raymarching.vert");
-	std::vector<std::string> fsSourcePaths4 = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/paddle.frag" };
+	std::vector<std::string> fsSourcePaths4 = { "res/shaders/noise.glsl", "res/shaders/sdf.glsl", "res/shaders/laser.frag" };
 	std::string fsSource4 = ParseShader(fsSourcePaths4);
 	const char* vs4 = vsSource4.c_str();
 	const char* fs4 = fsSource4.c_str();
@@ -251,6 +252,13 @@ int main()
 		case PARTICLES:
 			renderPARTICLES(window, program5, vaoFullQuad);
 			break;
+		}
+
+		if (captureFrame)
+		{
+			captureFrame = false;
+
+			glReadPixels(0, 0, width, height, GL_RGBA, GL_FLOAT, pixels);
 		}
 	}
 	glfwTerminate();
@@ -353,7 +361,7 @@ void process(GLFWwindow * window)
 void renderFULLSCREEN(GLFWwindow* window, unsigned int program, unsigned int vao)
 {
 	glfwMakeContextCurrent(window);
-	glClearColor(0.2f, 0.3f, 0.3f, 0.9f);
+	glClearColor(0.1f, 0.1f, 0.1f, 0.9f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
 	

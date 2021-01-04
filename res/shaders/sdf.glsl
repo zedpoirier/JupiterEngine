@@ -1,5 +1,4 @@
 #version 330 core
-
 //----------------------------------------------------
 // Primitive Operations (Constructive Solid Geometry)
 //----------------------------------------------------
@@ -28,6 +27,17 @@ float line( vec2 p, float r, vec2 a = vec2(0.0, 0.0), vec2 b = vec2(0.0, 1.0))
   vec2 pa = p - a, ba = b - a;
   float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
   return length( pa - ba*h ) - r;
+}
+
+float circle( vec2 p, float s )
+{
+  return length(p)-s;
+}
+
+float box( vec2 p, vec2 b )
+{
+  vec2 q = abs(p) - b;
+  return length(max(q,0.0)) + min(max(q.x,q.y),0.0);
 }
 
 //----------------------------------------------------

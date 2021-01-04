@@ -1,4 +1,5 @@
 #version 330 core
+#line 3
 in vec3 color;
 in vec2 texcoord;
 

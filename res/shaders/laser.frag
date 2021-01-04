@@ -1,4 +1,5 @@
 #version 330 core
+#line 3 // sets the next line's starting number
 in vec3 color;
 in vec2 texcoord;
 
@@ -26,6 +27,7 @@ void main()
     vec2 p = texcoord - 0.5; // center
 	vec3 color = vec3(0.8, 0.2, 1.0);
 
+	p.x *= clamp(pow(p.y + 1.5, 4.0), 0.1, 3.0);
 	//p *= mat2(easeIn(frame / 10.0), 0.0, 0.0, 1.0);
 	float b1 = beam(vec2(p.x, p.y - time.x * 1.0), 0.5, 20.0, 0.03);
 	p *= mat2(2.0, 0.0, 0.0, 1.0); 
@@ -35,6 +37,14 @@ void main()
 	p *= mat2(2.0, 0.0, 0.0, 1.0); 
 	float b4 = beam(vec2(p.x, p.y - time.x * 1.4), 0.3, 160.0, 0.03);
 	vec3 final = vec3(b1) * color + vec3(b2) * 0.3 + vec3(b3) * 0.3 + vec3(b4) * 0.3;
+
+	vec2 q = p;
+	q.y += 0.5;
+	q.x *= 0.2;
+	float mask = step(abs(pow(q.x * 0.8,2)), q.y);
+	mask *= step(q.y, abs(pow(q.x * -0.8,2) - 1.0));
+	final *= vec3(mask);
+	b1 *= mask;
 	FragColor = vec4(final, 1.0 - step(b1, 0.35));
 };
 
